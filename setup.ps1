@@ -1,4 +1,4 @@
-﻿# career-ops starter kit: one-time setup (safe to run again; it never overwrites your personal files).
+﻿# Construction Job Search Kit (based on career-ops): one-time setup (safe to run again; it never overwrites your personal files).
 #
 #   Double-click SETUP.cmd, or:  powershell -ExecutionPolicy Bypass -File setup.ps1 [-InstallDir C:\path] [-SkipPrereqs] [-NoTasks]
 #
@@ -57,7 +57,7 @@ function Chrome-Path {
     return $null
 }
 
-Write-Host "career-ops starter kit setup" -ForegroundColor White
+Write-Host "Construction Job Search Kit setup (based on career-ops)" -ForegroundColor White
 Write-Host "Install folder: $InstallDir"
 Get-ChildItem $Kit -Recurse -File | Unblock-File -ErrorAction SilentlyContinue   # files from a downloaded ZIP
 Refresh-Path
@@ -100,7 +100,7 @@ if (Test-Path (Join-Path $InstallDir '.git')) {
 }
 
 # ---------------------------------------------------------------- 3. kit tools (always refreshed)
-Step 'Adding the starter-kit tools'
+Step 'Adding the kit tools'
 & robocopy (Join-Path $Kit 'overlay') $InstallDir /E /NFL /NDL /NJH /NJS /NP | Out-Null
 if ($LASTEXITCODE -ge 8) { throw "copying the kit tools failed (robocopy $LASTEXITCODE)" }
 Ok 'local\ scripts, website changes and shortcuts copied'

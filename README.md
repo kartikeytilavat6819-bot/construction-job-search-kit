@@ -1,6 +1,6 @@
-# career-ops starter kit (construction management)
+# Construction Job Search Kit
 
-A ready-to-go job search setup built on [career-ops](https://github.com/career-ops-hq/career-ops), the open-source
+A ready-to-go job search setup **based on [career-ops](https://github.com/career-ops-hq/career-ops)**, the open-source
 AI job-search agent. It finds entry-level construction management jobs, filters out the ones that refuse visa
 sponsorship, scores the rest against your profile, writes a tailored one-page resume and cover letter for each,
 and fills in application forms in Chrome. **You always review and click Submit yourself.**
@@ -55,3 +55,8 @@ except what you send to Claude while you chat. The website runs only on your own
 - **Did the scan run?** See `career-ops\data\logs\daily-scan-*.log`, or ask Claude "check the last scan log".
 - **Turn off the automatic scan:** Start menu > Task Scheduler > `career-ops daily scan` > Disable.
 - **Anything else:** ask Claude in VS Code. It can read the logs and fix things.
+
+## Credits and license
+Based on [career-ops](https://github.com/career-ops-hq/career-ops) by Santiago Fernández de Valderrama (MIT License).
+This kit is an independent project and is not affiliated with or endorsed by career-ops. The files under
+`overlay/web/` are modified copies of career-ops files. See [LICENSE](LICENSE).

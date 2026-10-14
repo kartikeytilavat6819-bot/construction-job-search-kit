@@ -6,7 +6,7 @@ resume and cover letter career-ops made for that application.
 
 ## 1. Fill in your answers (once)
 Your answers live in **`profile.json` in this folder** (`<your career-ops folder>\local\chrome-autofill\profile.json`).
-If it isn't there yet, copy it from the starter kit's `templates\local\chrome-autofill\profile.json`.
+If it isn't there yet, copy it from the kit's `templates\local\chrome-autofill\profile.json`.
 
 - Open it in Notepad (right-click, Open with, Notepad) and replace each `null` with your answer in quotes,
   e.g. `"first_name": "Jane",`. Keep the commas and quotes exactly as they are.

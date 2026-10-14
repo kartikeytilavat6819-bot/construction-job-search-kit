@@ -1,9 +1,9 @@
 # START HERE: first-time setup with Claude
 
-> **For Claude.** The user just ran the starter kit's SETUP.cmd and typed something like "set me up".
+> **For Claude.** The user just ran the Construction Job Search Kit's SETUP.cmd and typed something like "set me up".
 > Follow these steps in order, one at a time, in plain language (she is a construction management
 > student, not a programmer). Ask before moving on. AGENTS.md onboarding rules still apply; this
-> file adds the starter-kit specifics on top.
+> file adds the kit's specifics on top.
 
 ## Kit rules (always)
 - **Never submit an application or send an email/message for her.** Autofill stops at review; Gmail only makes drafts.

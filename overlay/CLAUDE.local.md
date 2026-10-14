@@ -1,6 +1,6 @@
-# Starter-kit notes (local to this computer)
+# Construction Job Search Kit notes (local to this computer)
 
-This career-ops copy was set up with the career-ops starter kit for a **construction management** job search
+This career-ops copy was set up with the Construction Job Search Kit (based on career-ops) for a **construction management** job search
 (entry-level, needs H-1B sponsorship, Boston first, then New England, then anywhere in the US).
 
 - When she asks to "set me up", or `node doctor.mjs --json` shows `unpersonalized` files: follow `local/START-HERE.md`.

@@ -1,0 +1,536 @@
+# =====================================================================================================
+#  config/targeting.yml : WHAT KIND OF JOB IS A FIT  (construction management version)
+# =====================================================================================================
+#
+#  The free, automatic job filters in local/ (the "sieve", the ranking, the rule pre-filter) read this
+#  file to decide which postings are worth your time. Nothing here is sent anywhere. Edit it any time.
+#
+#  HOW TO EDIT (no programming needed)
+#   * Lines starting with # are notes for you. The computer ignores them.
+#   * Keep the spacing at the start of each line exactly as it is (use spaces, never Tab).
+#   * A list is one item per line, each starting with "- " (dash + space).
+#   * Words are matched as WHOLE words and capital letters don't matter:
+#       "project engineer"  matches "Project Engineer" and "project-engineer"
+#       "recruit*"          a * at the end means "any ending": recruit, recruiter, recruiting
+#     If an item contains a colon, an apostrophe at the start, or a # sign, put it in 'single quotes'.
+#   * After editing, check it with:   python local/targeting.py
+#     and test titles with:           python local/targeting.py "Assistant Project Manager" "Senior Estimator"
+#   * Then re-score jobs you already have (free, takes seconds):   python local/sieve.py --retier
+#
+#  The candidate's FACTS (experience, skills, education) live in cv.md and master-resume.md, and the
+#  scoring guide for Claude lives in modes/_profile.md and modes/_brief.md. This file only steers the
+#  automatic filters.
+# =====================================================================================================
+
+# The field, in plain words. Used in the instructions given to the optional AI model.
+field: "construction management (general contractors, construction managers / CM-at-risk, owner's representatives)"
+
+candidate:
+  # Graduation month, e.g. "May 2027". Leave "" if you don't want the AI to consider start dates.
+  graduation: ""
+  # Work authorization in one line (the filters already reject postings that refuse sponsorship).
+  work_authorization: "on F-1 OPT; will need H-1B sponsorship later"
+
+# -----------------------------------------------------------------------------------------------------
+#  LOCATION  -  where you want to work. Jobs outside the US are always rejected.
+# -----------------------------------------------------------------------------------------------------
+location:
+  home_metro:
+    label: "Boston area"          # name shown in results
+    towns:                        # towns that count as your home metro (only when no other state is named)
+      - boston
+      - cambridge
+      - somerville
+      - watertown
+      - newton
+      - waltham
+      - woburn
+      - burlington
+      - lexington
+      - bedford
+      - chelmsford
+      - lowell
+      - tewksbury
+      - andover
+      - wilmington
+      - reading
+      - wakefield
+      - medford
+      - malden
+      - everett
+      - chelsea
+      - revere
+      - winthrop
+      - lynn
+      - salem
+      - peabody
+      - danvers
+      - beverly
+      - quincy
+      - braintree
+      - weymouth
+      - hingham
+      - milton
+      - dedham
+      - westwood
+      - norwood
+      - canton
+      - needham
+      - wellesley
+      - brookline
+      - arlington
+      - belmont
+      - natick
+      - framingham
+      - marlborough
+      - foxborough
+      - mansfield
+      - worcester
+  home_state:
+    code: MA                      # 2-letter state code
+    name: Massachusetts
+  region:
+    label: "New England"
+    states: [CT, RI, NH, VT, ME]  # the next-best states after your home state
+  # Location score, 1 (bad) to 5 (best). It is one part of the overall score.
+  scores:
+    home_metro: 5.0
+    home_state: 4.6
+    region: 4.4
+    other_us: 4.0                 # anywhere else in the US (you will relocate)
+    unknown: 3.8                  # the posting doesn't say where
+    remote: 3.0                   # fully remote: least preferred
+
+# Employers you especially want. A job at one of these is never rejected for a low score (it stays at
+# least SILVER) unless a hard rule applies (sponsorship refusal, too senior, outside the US ...).
+# Remove the # in front of a line to switch it on, or add your own.
+priority_companies:
+  # - Suffolk
+  # - Gilbane
+  # - Turner Construction
+  # - Shawmut
+  # - Consigli
+  # - Skanska
+  # - Dimeo
+  # - Lee Kennedy
+
+# Words that mark a public agency. Public agencies rarely sponsor H-1B visas, so the ranking moves
+# them down a little (they are not rejected).
+public_agency_words:
+  - commonwealth of
+  - city of
+  - town of
+  - county of
+  - state of
+  - department of transportation
+  - mbta
+  - massport
+  - dcamm
+
+# -----------------------------------------------------------------------------------------------------
+#  JOB TITLES
+# -----------------------------------------------------------------------------------------------------
+titles:
+  # Words that show a title is entry level. They also "forgive" the words listed under
+  # senior_ok_with_entry_signal (so "ASSISTANT Project Manager" is fine but "Project Manager" is not).
+  entry_signals:
+    - entry
+    - entry level
+    - junior
+    - jr
+    - new grad
+    - graduate
+    - early career
+    - career start
+    - assistant
+    - associate
+    - trainee
+    - rotational
+    - development program
+    - project engineer           # the #1 entry title at general contractors
+    - field engineer
+    - project coordinator
+    - 're:\b(engineer|estimator|scheduler|coordinator|inspector|manager|superintendent)\s+(i|1)\b'
+    - "2026"
+    - "2027"
+
+  # Target job titles (each one adds points in the ranking).
+  target:
+    - project engineer
+    - field engineer
+    - assistant project manager
+    - apm
+    - project coordinator
+    - assistant superintendent
+    - superintendent
+    - estimator
+    - estimating
+    - preconstruction
+    - scheduler
+    - scheduling
+    - project controls
+    - cost engineer
+    - construction manager
+    - construction management
+    - owner's rep*
+    - owners rep*
+    - owner's project manager
+    - construction inspector
+    - inspector
+    - quality control
+    - qa/qc
+    - quality coordinator
+    - safety coordinator
+    - safety
+    - ehs
+    - bim coordinator
+    - vdc
+    - virtual design and construction
+    - construction
+
+  # Titles that are a stretch (small minus in the ranking, not rejected).
+  stretch:
+    - specialist
+    - consultant
+    - analyst
+
+  # Too senior (or not a full-time job): rejected, unless forgiven below.
+  too_senior:
+    - intern
+    - internship
+    - co-op
+    - coop
+    - senior
+    - sr
+    - principal
+    - director
+    - chief
+    - vice president
+    - vp
+    - president
+    - executive
+    - head of
+    - manager
+    - project manager
+    - superintendent
+    - general superintendent
+    - lead
+    - supervisor
+    - foreman
+    - general foreman
+  # Reject level II / III / IV titles ("Project Engineer II", "Estimator 3", "Level 2").
+  reject_level_2_plus: true
+  # These "too senior" words are OK when the title ALSO has an entry signal
+  # ("Assistant Project Manager", "Assistant Superintendent", "Construction Manager I").
+  senior_ok_with_entry_signal:
+    - manager
+    - project manager
+    - superintendent
+
+  # Design / other-discipline titles: always rejected.
+  off_discipline:
+    - structural engineer
+    - structural designer
+    - structural design
+    - geotechnical
+    - geotech*
+    - architect
+    - landscape architect
+    - software
+    - devops
+    - data scientist
+    - electrical engineer
+    - mechanical engineer
+    - plumbing engineer
+    - fire protection engineer
+    - process engineer
+
+  # Other occupations: rejected UNLESS the title also contains a word from exclude_unless.
+  exclude:
+    - accountant
+    - accounting
+    - payroll
+    - recruit*
+    - talent acquisition
+    - sales
+    - marketing
+    - business development
+    - nurse
+    - driver
+    - cdl
+    - laborer
+    - carpenter
+    - electrician
+    - plumber
+    - pipefitter
+    - welder
+    - mechanic
+    - ironworker
+    - operator
+    - warehouse
+    - receptionist
+    - administrative assistant
+    - admin assistant
+    - office assistant
+    - paralegal
+    - attorney
+    - counsel
+    - legal
+    - hr
+    - human resources
+    - customer service
+    - cashier
+    - janitor
+    - custodian
+    - it support
+    - help desk
+    - graphic designer
+    - interior designer
+    - chemist
+    - biologist
+    - geologist
+    - hydrogeologist
+    - ecologist
+    - archaeolog*
+    - finance
+    - financial analyst
+    - property manager
+    - leasing
+    - real estate agent
+    - broker
+    - insurance
+    - underwriter
+    - teacher
+    - instructor
+    - professor
+  exclude_unless:
+    - project engineer
+    - field engineer
+    - project manager
+    - superintendent
+    - estimator
+    - scheduler
+    - inspector
+    - project coordinator
+    - construction manager
+
+  # Support / technician level (below a graduate's level): rejected, unless the title also has a
+  # word from too_junior_keep_if and none from too_junior_never_keep.
+  too_junior:
+    - technician*
+    - tech
+    - locator
+    - drafter
+    - draftsperson
+    - cad tech*
+    - helper
+    - flagger
+    - apprentice
+  too_junior_keep_if:
+    - inspector
+    - bim
+    - vdc
+    - estimat*
+    - schedul*
+    - project
+    - field engineer
+    - safety
+    - quality
+    - qa/qc
+  too_junior_never_keep:
+    - material*
+    - testing
+    - lab
+    - survey*
+    - locat*
+    - maintenance
+    - hvac
+    - fleet
+    - field service
+    - it support
+    - computer
+
+# -----------------------------------------------------------------------------------------------------
+#  SKILLS  -  ONLY list skills that are really on the candidate's CV.
+#  Each line:   "word | other word | phrase": weight
+#  The weight (0.1 to 1.0) is how much a posting that asks for it counts. Several words on one line
+#  count once. Postings that mention more of these get a higher "prior" score.
+#  >>> Delete lines for anything the candidate has NOT done, and add real ones. <<<
+# -----------------------------------------------------------------------------------------------------
+skills:
+  "procore": 1.0
+  "primavera | p6": 0.8
+  "ms project | microsoft project": 0.6
+  "bluebeam": 0.8
+  "autocad": 0.5
+  "revit | navisworks | bim": 0.6
+  "excel": 0.2
+  "on screen takeoff | planswift | quantity takeoff | takeoff* | take off*": 0.8
+  "cost estimat* | estimating | bid package* | bid leveling | subcontractor bids": 0.9
+  "cpm schedul* | critical path | look ahead | lookahead | project schedule*": 0.8
+  "rfi* | submittal* | shop drawing* | change order* | punch list* | closeout | as built*": 1.0
+  "daily report* | meeting minutes | oac meeting* | owner meeting*": 0.7
+  "cost control | cost tracking | earned value | project controls | budget*": 0.6
+  "osha | site safety | safety program*": 0.5
+  "quality control | qa/qc | inspection*": 0.6
+  "contract administration | pay application* | pay requisition* | aia | subcontract*": 0.7
+  "construction management | general contractor | cm at risk | design build": 0.8
+  "leed | sustainab*": 0.2
+
+# -----------------------------------------------------------------------------------------------------
+#  POSTING TEXT
+# -----------------------------------------------------------------------------------------------------
+jd:
+  # Words that show the posting is in your field ...
+  on_target_terms:
+    - construction
+    - general contractor
+    - construction management
+    - construction manager
+    - project engineer
+    - field engineer
+    - superintendent
+    - subcontractor*
+    - submittal*
+    - rfi*
+    - jobsite
+    - job site
+    - preconstruction
+    - estimating
+    - scheduling
+    - owner's rep*
+    - cm at risk
+    - inspection
+    - renovation
+    - fit out
+  # ... and words that show it is really different work. If most field words in a posting are from
+  # this list and few skills match, the job is rejected.
+  off_target_terms:
+    - structural analysis
+    - structural design
+    - finite element
+    - geotechnical
+    - soil boring*
+    - software develop*
+    - coding
+    - sales quota*
+    - quota
+    - cold calling
+    - lead generation
+    - commission based
+    - retail sales
+    - clinical
+    - wafer
+    - semiconductor
+    - materials testing
+    - laboratory testing
+  # Extra words in a posting that mean "entry level" (general ones like "entry-level", "new grad",
+  # "0-2 years" are already built in).
+  entry_terms:
+    - assistant project manager
+    - assistant superintendent
+    - project engineer i
+    - career start
+    - rotational program
+    - trainee
+    - development program
+  # Optional: work you want to push down (not reject). Example for a civil engineer:
+  #   terms: [substation, transmission line]   min_hits: 2   points: 0.8   note: "power / substation work"
+  penalty:
+    terms: []
+    min_hits: 2
+    points: 0.8
+    note: "off-target work in the posting"
+  # Degree fields that fit the candidate (a posting asking only for a high-school diploma, with none of
+  # these, is treated as technician level).
+  degree_fields:
+    - construction management
+    - construction
+    - civil
+    - engineering
+    - architecture
+    - building
+
+# -----------------------------------------------------------------------------------------------------
+#  HARD RULES
+# -----------------------------------------------------------------------------------------------------
+rules:
+  # A posting that REQUIRES more years than this is rejected ("3+ years required" when this is 2).
+  # "Preferred" years never reject.
+  max_years_required: 2
+  # Reject postings that REQUIRE a Professional Engineer (PE) license at hire.
+  pe_license_required_is_blocker: true
+
+# -----------------------------------------------------------------------------------------------------
+#  KINDS OF WORK  (only used by the optional AI stages; one word_with_underscores per kind)
+# -----------------------------------------------------------------------------------------------------
+disciplines:
+  target:
+    - general_contracting_project_engineering
+    - field_engineering_superintendent
+    - estimating_preconstruction
+    - scheduling_project_controls
+    - owners_rep_program_management
+    - quality_safety_inspection
+    - construction_management_other
+  neutral:                        # small minus, not rejected
+    - civil_design
+    - mep_coordination
+    - facilities_maintenance
+    - real_estate_development
+    - environmental
+  off_target:                     # rejected when the AI and the keywords agree
+    - structural_design
+    - geotechnical_design
+    - architecture_design
+    - software_it
+    - sales_marketing
+    - skilled_trades_labor
+
+# -----------------------------------------------------------------------------------------------------
+#  SCORE CUT-OFFS  (1-5 scale)
+#   GOLD   = send to Claude for a full evaluation + tailored CV
+#   SILVER = worth a quick look / Claude quick triage
+#   REJECT = hidden from the inbox (still listed on the EVERY JOB tab with the reason)
+# -----------------------------------------------------------------------------------------------------
+scoring:
+  # With an AI model (OpenRouter free models or Ollama):
+  gold_at: 4.0
+  silver_at: 3.3
+  # Rules only (no AI model available - the normal case on a laptop without a GPU):
+  #   prior = 0.7 x posting score (skills, entry-level words, sponsor history, off-target share)
+  #         + 0.3 x location score
+  rules_only_gold_at: 3.9
+  rules_only_silver_at: 3.0
+
+# -----------------------------------------------------------------------------------------------------
+#  WORDING FOR THE OPTIONAL AI MODEL  (plain English; the model reads these sentences)
+# -----------------------------------------------------------------------------------------------------
+ai:
+  employer: "a US general contractor, construction manager (CM-at-risk) or owner's-representative firm"
+  entry_level_titles: "Project Engineer, Field Engineer, Assistant Project Manager, Project Coordinator, Assistant Superintendent, Assistant Estimator, Scheduler, Project Controls Analyst, Cost Engineer, Construction Inspector, Safety or Quality Coordinator"
+  off_target_work: "structural / geotechnical / architectural DESIGN as the main work; a skilled-trade or labor role; sales, marketing, real-estate brokerage or pure software-IT"
+  discipline_hints: "a GC Project Engineer handling RFIs and submittals is general_contracting_project_engineering; a Field Engineer or Assistant Superintendent on site is field_engineering_superintendent; an estimator or preconstruction role is estimating_preconstruction; an owner's representative or CM-agency role is owners_rep_program_management; a construction inspector, QA/QC or safety coordinator is quality_safety_inspection"
+  degree_note: "a construction management degree counts for 'construction management, construction engineering, civil engineering, architecture, building science or a related field' requirements"
+  learnable_software:
+    - Procore
+    - Primavera P6
+    - Microsoft Project
+    - Bluebeam
+    - Autodesk Construction Cloud
+    - Revit
+    - Navisworks
+    - Sage
+    - Viewpoint
+    - HCSS
+    - On-Screen Takeoff
+    - PlanSwift
+  obtainable_certifications:
+    - OSHA 10/30
+    - First Aid/CPR
+    - LEED Green Associate
+    - CAPM
+    - CHST or CCM later
+    - Construction Supervisor License later
+    - driver's license
+  red_flags: "level II or 2+ years preferred; a must-have certification the candidate lacks at hire; mostly design or trade work; a start date that does not fit the graduation date"

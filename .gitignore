@@ -1,0 +1,15 @@
+# Safety net: the kit must never carry personal data.
+*.key
+*token*.json
+*credentials*.json
+client_secret*.json
+.env
+__pycache__/
+*.pyc
+*.log
+*.bak*
+node_modules/
+overlay/local/secrets/
+overlay/local/cache/
+overlay/local/chrome-autofill/profile.json
+overlay/local/resume-builder/backups/

@@ -1,0 +1,45 @@
+# career-ops plugin switches (see config/plugins.example.yml and docs/PLUGINS.md).
+#
+# A plugin runs only when BOTH are true:
+#   1. it is enabled here, and
+#   2. any secret keys it needs are in your .env file (never put keys in this file).
+# After changing this file, run:   node plugins.mjs list     (shows what is on and what is missing)
+# The first time you enable a plugin, record your consent with:
+#   node plugins.mjs enable <name> --confirm
+
+plugins:
+  # -- Needs a Google account connection (OAuth) - OFF until you set it up ---------------------
+  # Pulls job leads from a Gmail label (e.g. job-alert emails you filter into "Job Leads").
+  # Needs GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REFRESH_TOKEN in .env. Turn on after
+  # connecting Google (note: Google's "Testing" mode tokens expire weekly and need reconnecting).
+  gmail:
+    enabled: false
+    label: Job Leads
+    days_back: 7
+
+  # Reads LinkedIn job-alert emails from the same Gmail account and adds the job links to your
+  # pipeline. Uses the same three GMAIL_* keys as the gmail plugin. Turn on after connecting Google.
+  linkedin-alerts:
+    enabled: false
+    days: 7
+
+  # Spots interview invitations on your Google Calendar. Needs GOOGLE_CALENDAR_CLIENT_ID,
+  # GOOGLE_CALENDAR_CLIENT_SECRET, GOOGLE_CALENDAR_REFRESH_TOKEN in .env. Turn on after connecting Google.
+  google-calendar:
+    enabled: false
+
+  # -- Work without any account or key - ON -------------------------------------------------------
+  # Exports cv.md to a Word .docx (some employer portals want Word). Fully offline, no keys.
+  # It is a community plugin: if `node plugins.mjs list` says it is not installed, run
+  #   node plugins.mjs add docx
+  docx:
+    enabled: true
+    format: letter
+
+  # Looks up an employer's real H-1B / green-card filing history (US Department of Labor data)
+  # so you can tell which companies actually sponsor. Runs locally - nothing about your search
+  # leaves your computer. One-time setup (downloads an ~8 MB data file into data/h1b/):
+  #   node plugins/h1b-sponsor/install-h1b-index.mjs
+  # Check a company by hand:   node plugins/h1b-sponsor/check.mjs "Turner Construction" --summary
+  h1b-sponsor:
+    enabled: true

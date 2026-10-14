@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "career-ops Autofill",
+  "version": "2.0.0",
+  "description": "Fills job applications from your profile while you watch, and attaches the tailored resume and cover letter from career-ops. Never submits.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmuk1zmzlc8uDozitqHwfj566d7KdRtIfT6/z/Rp9p2ja3++CNAyup0epHZ0E6xHlrf/6KBU2GWhW7maoKqg61qTHEmSu2Thmmzap2qsDv0h9ytSL2LThoiRw3HACbbAbE/sQM0zAgC2ZodudkOeRRr1aF8wYKE6KwGOnUukNvRVX6S9v7PmH/tHWz0vAlrVeOUgJWwkvI1LuucfTMFpevucaZ1cE2UheQ6UC3eVfCKgUEGF5owmHLrZYPaIQJxaEvxTHCKka1VOg5zn54vLZR0bRSw8YwpvyqZH4KPiIh/3PAirbqjJmfUFjpjzzQ1ZXO4lQ4cMLJd2BanOyTm3DWwIDAQAB",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "career-ops Autofill",
+    "default_popup": "popup.html"
+  }
+}

@@ -1,0 +1,8 @@
+﻿# Python libraries used by the kit's local\ scripts (installed by setup.ps1)
+requests
+beautifulsoup4
+pyyaml
+pypdf
+playwright
+google-auth-oauthlib
+google-api-python-client

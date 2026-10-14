@@ -1,0 +1,131 @@
+{
+  "_readme": "Your master resume library. Every point you have ever written lives here ONCE; each track (resume type) picks and orders some of them. Easiest way to edit: the Resume Editor (http://127.0.0.1:3002). Replace everything in CAPITALS / marked EXAMPLE with your real facts, and delete examples you don't need. Bullet status: ok = may print; confirm = not checked yet, never prints on a track resume; never = kept only as a record. Track ids: lowercase letters, digits and dashes.",
+  "contact": {
+    "name": "YOUR NAME",
+    "location": "Boston, MA",
+    "phone": "YOUR PHONE",
+    "email": "YOUR EMAIL",
+    "linkedin": "linkedin.com/in/YOUR-PROFILE"
+  },
+  "tracks": [
+    {"id": "project-engineer", "name": "Project Engineer / APM"},
+    {"id": "field", "name": "Field Engineer / Superintendent"},
+    {"id": "estimating", "name": "Estimating / Precon / Controls"}
+  ],
+  "settings": {
+    "copy_outputs_to": null
+  },
+  "layout": {
+    "project-engineer": {
+      "sections": ["SUMMARY", "EXPERIENCE", "PROJECTS", "EDUCATION", "SKILLS", "AFFILIATIONS"],
+      "summary": "EXAMPLE: Construction management graduate student seeking an entry-level Project Engineer role with a general contractor. Two short, polite lines about what you bring.",
+      "experience": [
+        {"id": "example-gc-intern", "bullets": ["example-gc-intern-1", "example-gc-intern-2", "example-gc-intern-3"]}
+      ],
+      "projects": [
+        {"id": "example-capstone", "bullets": ["example-capstone-1"]}
+      ],
+      "education": ["example-ms"],
+      "courses": {"example-ms": ["EXAMPLE COURSE: Construction Project Management", "EXAMPLE COURSE: Construction Contracts and Law", "EXAMPLE COURSE: Scheduling"]},
+      "show_gpa": false,
+      "skills": [
+        {"label": "Software", "text": "EXAMPLE: list only tools you have really used"},
+        {"label": "Construction", "text": "EXAMPLE: RFIs, submittals, meeting minutes"}
+      ],
+      "affiliations": ["example-aff"],
+      "format": {}
+    },
+    "field": {
+      "sections": ["SUMMARY", "EXPERIENCE", "EDUCATION", "SKILLS", "AFFILIATIONS"],
+      "summary": "EXAMPLE: Construction management graduate student seeking an entry-level Field Engineer role. Two short, polite lines.",
+      "experience": [
+        {"id": "example-gc-intern", "title": "EXAMPLE: Field Engineering Intern", "bullets": ["example-gc-intern-3", "example-gc-intern-1"]}
+      ],
+      "projects": [],
+      "education": ["example-ms"],
+      "courses": {"example-ms": ["EXAMPLE COURSE: Construction Methods", "EXAMPLE COURSE: Construction Safety"]},
+      "show_gpa": false,
+      "skills": [
+        {"label": "Field", "text": "EXAMPLE: site walks, daily reports, quality and safety inspections"}
+      ],
+      "affiliations": ["example-aff"],
+      "format": {}
+    },
+    "estimating": {
+      "sections": ["SUMMARY", "EXPERIENCE", "PROJECTS", "EDUCATION", "SKILLS", "AFFILIATIONS"],
+      "summary": "EXAMPLE: Construction management graduate student seeking an entry-level Estimator or Preconstruction role. Two short, polite lines.",
+      "experience": [
+        {"id": "example-gc-intern", "bullets": ["example-gc-intern-2", "example-gc-intern-1"]}
+      ],
+      "projects": [
+        {"id": "example-capstone", "bullets": ["example-capstone-1"]}
+      ],
+      "education": ["example-ms"],
+      "courses": {"example-ms": ["EXAMPLE COURSE: Cost Estimating", "EXAMPLE COURSE: Construction Finance"]},
+      "show_gpa": false,
+      "skills": [
+        {"label": "Estimating", "text": "EXAMPLE: quantity takeoff, bid leveling (only what you have done)"}
+      ],
+      "affiliations": ["example-aff"],
+      "format": {}
+    }
+  },
+  "experience": [
+    {
+      "id": "example-gc-intern",
+      "org": "EXAMPLE GENERAL CONTRACTOR",
+      "title": "EXAMPLE: Project Engineering Intern",
+      "location": "Boston, MA",
+      "dates": "May 2026 – Aug 2026",
+      "note": "EXAMPLE entry: replace it with a real job, then mark each bullet ok once it is true and checked.",
+      "bullets": [
+        {"id": "example-gc-intern-1", "text": "EXAMPLE: Tracked submittals and RFIs for a building project, keeping the logs current for the project team.", "tracks": ["project-engineer", "field", "estimating"], "status": "confirm"},
+        {"id": "example-gc-intern-2", "text": "EXAMPLE: Helped prepare quantity takeoffs and compared subcontractor bids for a bid package.", "tracks": ["estimating", "project-engineer"], "status": "confirm"},
+        {"id": "example-gc-intern-3", "text": "EXAMPLE: Walked the site daily with the superintendent, wrote daily reports and logged safety observations.", "tracks": ["field", "project-engineer"], "status": "confirm"}
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "id": "example-capstone",
+      "org": "EXAMPLE: Capstone project name",
+      "title": "",
+      "location": "YOUR UNIVERSITY",
+      "dates": "Spring 2027",
+      "bullets": [
+        {"id": "example-capstone-1", "text": "EXAMPLE: Built a schedule and cost estimate for a mid-rise building as a team of four.", "tracks": ["project-engineer", "estimating"], "status": "confirm"}
+      ]
+    }
+  ],
+  "education": [
+    {
+      "id": "example-ms",
+      "school": "YOUR UNIVERSITY",
+      "location": "Boston, MA",
+      "dates": "Expected May 2027",
+      "degree": "M.S. Construction Management",
+      "gpa": "",
+      "courses": [
+        "EXAMPLE COURSE: Construction Project Management",
+        "EXAMPLE COURSE: Construction Contracts and Law",
+        "EXAMPLE COURSE: Scheduling",
+        "EXAMPLE COURSE: Construction Methods",
+        "EXAMPLE COURSE: Construction Safety",
+        "EXAMPLE COURSE: Cost Estimating",
+        "EXAMPLE COURSE: Construction Finance"
+      ]
+    }
+  ],
+  "skills": [
+    {"id": "skill-software", "label": "Software", "text": "EXAMPLE: list every tool you have really used, e.g. Procore, Bluebeam, MS Project, Excel"},
+    {"id": "skill-construction", "label": "Construction", "text": "EXAMPLE: RFIs, submittals, meeting minutes, daily reports"},
+    {"id": "skill-estimating", "label": "Estimating", "text": "EXAMPLE: quantity takeoff, bid leveling"}
+  ],
+  "affiliations": [
+    {"id": "example-aff", "text": "EXAMPLE: Student member, a construction or engineering association (since 2026)", "short": "EXAMPLE: Association member"}
+  ],
+  "never_claim": [
+    "EXAMPLE: tools, licenses or certifications you do not have (write them here so the AI never adds them)"
+  ],
+  "references": []
+}

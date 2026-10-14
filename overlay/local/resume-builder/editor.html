@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resume Editor</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#1d2330; --mute:#6b7280; --line:#e3e6eb; --acc:#2557d6; --ok:#13804b; --warn:#b45309; --bad:#b91c1c; --chip:#eef2ff; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.45 system-ui, "Segoe UI", sans-serif; background:var(--bg); color:var(--ink); }
+  header { position:sticky; top:0; z-index:5; display:flex; gap:8px; align-items:center; flex-wrap:wrap; padding:10px 14px; background:var(--card); border-bottom:1px solid var(--line); }
+  header h1 { font-size:16px; margin:0 10px 0 0; }
+  .tabs { display:flex; gap:4px; flex-wrap:wrap; }
+  .tab { border:1px solid var(--line); background:#fff; padding:6px 12px; border-radius:6px; cursor:pointer; }
+  .tab.on { background:var(--acc); color:#fff; border-color:var(--acc); }
+  .spacer { flex:1; }
+  button { font:inherit; border:1px solid var(--line); background:#fff; padding:6px 12px; border-radius:6px; cursor:pointer; }
+  button.primary { background:var(--acc); color:#fff; border-color:var(--acc); }
+  button.small { padding:2px 7px; font-size:12px; }
+  button:disabled { opacity:.5; cursor:default; }
+  #status { font-size:13px; color:var(--mute); min-width:160px; }
+  #status.ok { color:var(--ok); } #status.warn { color:var(--warn); } #status.bad { color:var(--bad); }
+  main { display:grid; grid-template-columns: minmax(420px, 1fr) minmax(380px, 46%); gap:0; height:calc(100vh - 54px); }
+  #left { overflow:auto; padding:14px; }
+  #right { border-left:1px solid var(--line); background:#525659; display:flex; flex-direction:column; }
+  #right .bar { background:var(--card); padding:6px 10px; font-size:13px; display:flex; gap:8px; align-items:center; border-bottom:1px solid var(--line); }
+  #pages { flex:1; overflow:auto; padding:14px; display:flex; flex-direction:column; align-items:center; gap:14px; }
+  #layout { background:var(--card); border-bottom:1px solid var(--line); padding:8px 12px; display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px 14px; font-size:12px; }
+  #layout.hide { display:none; }
+  #layout label { display:flex; flex-direction:column; gap:1px; color:var(--mute); }
+  #layout label b { color:var(--ink); font-weight:600; }
+  #layout input[type=range] { width:100%; accent-color:var(--acc); }
+  #layout .btns { display:flex; gap:6px; align-items:flex-end; }
+  .zoom button.on { background:var(--acc); color:#fff; border-color:var(--acc); }
+  #pages canvas { cursor:pointer; }
+  textarea.flash, input.flash { outline:3px solid #f59e0b; background:#fffbeb; transition:background .3s; }
+  .hint { font-size:12px; color:var(--mute); }
+  #pages canvas { background:#fff; box-shadow:0 2px 10px rgba(0,0,0,.35); max-width:100%; height:auto; }
+  #pages .over { color:#fff; background:var(--bad); font-weight:600; padding:4px 10px; border-radius:4px; font-size:13px; }
+  #pages.busy canvas { opacity:.55; transition:opacity .2s; }
+  .fit { font-weight:700; padding:3px 10px; border-radius:999px; font-size:13px; background:#e5e7eb; color:#374151; white-space:nowrap; }
+  .fit.ok { background:#dcfce7; color:#14532d; } .fit.bad { background:#fee2e2; color:#991b1b; } .fit.tight { background:#fef3c7; color:#92400e; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:12px; margin-bottom:12px; }
+  .card h2 { font-size:13px; letter-spacing:.06em; text-transform:uppercase; margin:0 0 8px; color:#374151; display:flex; align-items:center; gap:8px; }
+  .entry { border-top:1px dashed var(--line); padding-top:10px; margin-top:10px; }
+  .entry:first-of-type { border-top:0; margin-top:0; padding-top:0; }
+  .ehead { display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-bottom:6px; }
+  .ehead b { font-size:14px; }
+  .mute { color:var(--mute); font-size:12px; }
+  textarea, input[type=text], select { font:inherit; width:100%; border:1px solid var(--line); border-radius:6px; padding:6px 8px; background:#fff; color:var(--ink); }
+  textarea { resize:vertical; min-height:38px; }
+  .row { display:flex; gap:6px; align-items:flex-start; margin:4px 0; }
+  .row .grow { flex:1; }
+  .bul { display:flex; gap:6px; align-items:flex-start; padding:4px; border-radius:6px; }
+  .bul:hover { background:#f8fafc; }
+  .bul .grow { flex:1; min-width:0; }
+  .bul .n { width:18px; text-align:right; color:var(--mute); font-size:12px; padding-top:7px; }
+  .bul .ctl { display:flex; flex-direction:column; gap:2px; }
+  .unused { opacity:.78; }
+  .unused .txt { font-size:13px; padding-top:3px; flex:1; }
+  details > summary { cursor:pointer; color:var(--acc); font-size:13px; margin:6px 0; }
+  .chip { display:inline-flex; align-items:center; gap:4px; background:var(--chip); border-radius:999px; padding:2px 8px; margin:2px; font-size:12px; }
+  .chips label { display:inline-flex; gap:4px; align-items:center; margin:2px 10px 2px 0; font-size:13px; }
+  .tag { font-size:11px; padding:1px 6px; border-radius:4px; background:#f1f5f9; color:#475569; margin-left:4px; }
+  .tag.confirm { background:#fef3c7; color:#92400e; } .tag.never { background:#fee2e2; color:#991b1b; }
+  .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap:6px; }
+  .grid4 { display:grid; grid-template-columns: repeat(4, 1fr); gap:6px; }
+  .help { font-size:12.5px; color:var(--mute); margin:0 0 8px; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; height:auto; } #right { height:80vh; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Resume Editor</h1>
+  <div class="tabs" id="tabs"></div>
+  <span class="spacer"></span>
+  <span id="status">Loading...</span>
+  <button class="primary" id="buildBtn" onclick="build()" title="Changes save and rebuild by themselves; this forces it now (Ctrl+S)">Rebuild now</button>
+</header>
+<main>
+  <div id="left"></div>
+  <div id="right">
+    <div class="bar"><span id="fit" class="fit">…</span><span id="pdfLabel">Preview</span><span class="hint">· click any line to edit it</span><span class="spacer"></span>
+      <button class="small" id="layoutBtn" onclick="toggleLayout()">⚙ Page layout</button>
+      <span class="zoom" id="zoom"></span>
+      <a id="pdfOpen" href="#" target="_blank">Open PDF</a></div>
+    <div id="layout"></div>
+    <div id="pages"></div>
+  </div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+let M = null, cur = null, dirty = false;
+let DOC = null;  // tailored resume being edited: {file, report, doc}
+let SLUG = '';   // your name as career-ops writes it in output/cv-<slug>-<company>-<date> (from /api/info)
+const shortName = f => f.replace(/^cv-/, '').replace(SLUG ? new RegExp('^' + SLUG.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '-') : /^$/, '');
+const $ = s => document.querySelector(s);
+const h = (tag, attrs = {}, ...kids) => {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else if (k === 'class') el.className = v;
+    else if (k === 'value') el.value = v;
+    else if (k === 'checked') el.checked = v;
+    else if (v !== false && v != null) el.setAttribute(k, v);
+  }
+  for (const c of kids.flat()) if (c != null) el.append(c.nodeType ? c : document.createTextNode(c));
+  return el;
+};
+const SECTIONS = ['SUMMARY', 'EXPERIENCE', 'PROJECTS', 'EDUCATION', 'SKILLS', 'AFFILIATIONS'];
+const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+// Every change saves + rebuilds by itself shortly after you stop (typing waits a bit longer).
+let timer = null, building = false, again = false;
+function mark(delay) { dirty = true; setStatus('Editing…', 'warn'); clearTimeout(timer); timer = setTimeout(build, typeof delay === 'number' ? delay : 350); }
+function setStatus(t, cls = '') { const s = $('#status'); s.textContent = t; s.className = cls; }
+function move(arr, i, d) { const j = i + d; if (j < 0 || j >= arr.length) return; [arr[i], arr[j]] = [arr[j], arr[i]]; }
+function autosize(t) { t.style.height = 'auto'; t.style.height = (t.scrollHeight + 2) + 'px'; }
+function ta(value, oninput, rows, key) {
+  const t = h('textarea', { rows: rows || 1, value, 'data-key': key || null, oninput: e => { oninput(e.target.value); autosize(e.target); mark(900); } });
+  requestAnimationFrame(() => autosize(t)); return t;
+}
+function inp(value, oninput, ph) { return h('input', { type: 'text', value: value || '', placeholder: ph || '', oninput: e => { oninput(e.target.value); mark(900); } }); }
+
+async function load() {
+  const res = await fetch('/api/master');
+  M = await res.json();
+  if (!res.ok) { setStatus(M.error || 'Could not load master-resume.json', 'bad'); return; }
+  if (!M.tracks.length) { M.tracks.push({ id: 'main', name: 'Main' }); M.layout.main = M.layout.main || { sections: [...SECTIONS], experience: [], projects: [], skills: [], affiliations: [], courses: {}, format: {} }; }
+  try { SLUG = (await (await fetch('/api/info')).json()).slug || ''; } catch (e) { SLUG = ''; }
+  cur = localStorageGet('track') || M.tracks[0].id;
+  if (cur === 'doc' || (cur !== 'library' && cur !== 'full' && !M.layout[cur])) cur = M.tracks[0].id;
+  const q = new URLSearchParams(location.search);
+  if (q.get('report') || q.get('file')) await openDoc(q.get('report') ? 'report=' + encodeURIComponent(q.get('report')) : 'file=' + encodeURIComponent(q.get('file')));
+  render(); renderLayout(); renderZoom(); showPdf(); if (!DOC) setStatus('Loaded', 'ok');
+}
+async function openDoc(query) {
+  const r = await fetch('/api/doc?' + query), j = await r.json();
+  if (!r.ok) { setStatus(j.error || 'Could not open that resume', 'bad'); return false; }
+  DOC = j; cur = 'doc';
+  history.replaceState(null, '', '/?file=' + encodeURIComponent(j.file));
+  setStatus('Opened the tailored resume. Changes save into it automatically.', 'ok');
+  return true;
+}
+async function pickDoc() {
+  const files = await (await fetch('/api/docs')).json();
+  const box = $('#left'); box.innerHTML = '';
+  const list = h('div', { class: 'card' }, h('h2', {}, 'Open a tailored resume'),
+    h('p', { class: 'help' }, 'These are the resumes career-ops tailored for each job (newest first). You can also open one straight from a job in career-ops with its "✎ Edit CV" button.'),
+    h('input', { type: 'text', placeholder: 'Filter by company or job, e.g. estimator', oninput: e => {
+      const q = e.target.value.toLowerCase(); for (const row of list.querySelectorAll('.pick')) row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none'; } }));
+  for (const f of files) list.append(h('div', { class: 'pick bul', style: 'cursor:pointer', onclick: async () => { if (await openDoc('file=' + encodeURIComponent(f))) { render(); renderLayout(); showPdf(); } } },
+    h('span', { class: 'txt' }, shortName(f))));
+  box.append(list);
+}
+function localStorageGet(k) { try { return localStorage.getItem('re-' + k); } catch (e) { return null; } }
+function localStorageSet(k, v) { try { localStorage.setItem('re-' + k, v); } catch (e) {} }
+
+function renderTabs() {
+  const t = $('#tabs'); t.innerHTML = '';
+  for (const tr of M.tracks) t.append(h('div', { class: 'tab' + (cur === tr.id ? ' on' : ''), onclick: () => go(tr.id) }, tr.name));
+  t.append(h('div', { class: 'tab' + (cur === 'full' ? ' on' : ''), onclick: () => go('full'), title: 'Every point, several pages' }, 'Full master'));
+  t.append(h('div', { class: 'tab' + (cur === 'library' ? ' on' : ''), onclick: () => go('library'), title: 'Edit every point and its tags' }, 'Library (all points)'));
+  t.append(h('div', { class: 'tab', onclick: newTrack, title: 'Make a new resume type from the current one' }, '+ New type'));
+  if (DOC) t.append(h('div', { class: 'tab' + (cur === 'doc' ? ' on' : ''), onclick: () => go('doc'), title: DOC.file }, '✎ ' + docLabel()));
+  t.append(h('div', { class: 'tab', onclick: pickDoc, title: 'Edit a resume career-ops tailored for a job' }, 'Open tailored…'));
+}
+function docLabel() { return 'Tailored: ' + shortName(DOC.file).replace(/-20\d\d-\d\d-\d\d.*$/, ''); }
+function go(id) {
+  cur = id; if (id !== 'doc') { localStorageSet('track', id); history.replaceState(null, '', '/'); } else history.replaceState(null, '', '/?file=' + encodeURIComponent(DOC.file));
+  render(); renderLayout(); showPdf();
+}
+
+/* ---------- page layout sliders (margins, font, spacing) ---------- */
+const LAYOUT = [
+  ['margin', 'Top / bottom margin', 'in', 0.3, 0.8, 0.05, 0.5],
+  ['side', 'Left / right margin', 'in', 0.3, 0.9, 0.05, 0.6],
+  ['font', 'Font size', 'pt', 9, 11, 0.25, 10],
+  ['leading', 'Line height', 'pt', 10.5, 13, 0.25, 12],
+  ['itemsep', 'Gap between bullets', 'pt', 0, 3, 0.25, 1],
+  ['jobgap', 'Gap between jobs', 'pt', 0, 6, 0.5, 3],
+  ['secgap', 'Gap before sections', 'pt', 0, 8, 0.5, 4],
+];
+function toggleLayout() { const hidden = localStorageGet('layout') === 'hide'; localStorageSet('layout', hidden ? 'show' : 'hide'); renderLayout(); }
+function renderLayout() {
+  const box = $('#layout'), tid = previewTrack(), T = tid === 'doc' ? DOC.doc : M.layout[tid];
+  box.innerHTML = '';
+  if (!T || tid === 'full' || localStorageGet('layout') === 'hide') { box.classList.add('hide'); return; }
+  box.classList.remove('hide');
+  T.format = T.format || {};
+  for (const [k, lab, unit, min, max, step, d] of LAYOUT) {
+    const val = T.format[k] ?? d, out = h('b', {}, val + ' ' + unit);
+    box.append(h('label', {}, h('span', {}, lab + ': ', out),
+      h('input', { type: 'range', min, max, step, value: val, oninput: e => {
+        T.format[k] = parseFloat(e.target.value); out.textContent = T.format[k] + ' ' + unit; mark(450); } })));
+  }
+  box.append(h('div', { class: 'btns' },
+    h('button', { class: 'small', title: 'Back to the standard v2 layout', onclick: () => { T.format = {}; renderLayout(); mark(); } }, 'Reset'),
+    h('button', { class: 'small', title: 'Smaller margins and gaps to fit more points', onclick: () => {
+      T.format = { margin: 0.4, side: 0.5, font: 10, leading: 11.75, itemsep: 0.5, jobgap: 2, secgap: 3 }; renderLayout(); mark(); } }, 'Fit more')));
+}
+function renderZoom() {
+  const z = localStorageGet('zoom') || '1', box = $('#zoom'); box.innerHTML = '';
+  for (const [v, t] of [['1', 'Fit'], ['1.4', '140%'], ['2', '200%']])
+    box.append(h('button', { class: 'small' + (z === v ? ' on' : ''), onclick: () => { localStorageSet('zoom', v); renderZoom(); showPdf(); } }, t));
+}
+
+/* ---------- click a line in the preview -> jump to that point's edit box ---------- */
+const norm = s => (s || '').normalize('NFKD').replace(/\*\*/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+function textLines(items) {
+  const rows = [];
+  for (const it of items) {
+    if (!it.str.trim()) continue;
+    const y = it.transform[5];
+    let r = rows.find(r => Math.abs(r.y - y) < 2.5);
+    if (!r) rows.push(r = { y, parts: [] });
+    r.parts.push([it.transform[4], it.str]);
+  }
+  return rows.map(r => ({ y: r.y, text: r.parts.sort((a, b) => a[0] - b[0]).map(p => p[1]).join(' ') }));
+}
+function editTargets() {
+  const tid = previewTrack(), out = [];
+  if (tid === 'doc') {
+    DOC.doc.sections.forEach((sec, si) => {
+      if (sec.type === 'summary') out.push(['summary', sec.text]);
+      if (sec.type === 'entries') sec.entries.forEach((e, ei) => e.bullets.forEach((b, bi) => out.push([`d:${si}:${ei}:${bi}`, b])));
+      if (sec.type === 'skills') sec.lines.forEach((l, li) => out.push([`ds:${si}:${li}`, l.label + ': ' + l.text]));
+      if (sec.type === 'paras') sec.items.forEach((x, i) => out.push([`dp:${si}:${i}`, x]));
+      if (sec.type === 'bullets') sec.items.forEach((x, i) => out.push([`db:${si}:${i}`, x]));
+      if (sec.type === 'education') sec.entries.forEach((e, ei) => out.push([`dc:${si}:${ei}`, 'Relevant Coursework: ' + e.courses]));
+    });
+    return out;
+  }
+  const T = M.layout[tid] || {};
+  if (T.summary) out.push(['summary', T.summary]);
+  for (const [pool, picks] of [[M.experience, T.experience || []], [M.projects, T.projects || []]])
+    for (const p of picks) { const e = pool.find(x => x.id === p.id); if (!e) continue;
+      for (const bid of p.bullets || []) { const b = e.bullets.find(x => x.id === bid); if (b) out.push(['b:' + b.id, b.text]); } }
+  (T.skills || []).forEach((s, i) => out.push(['skill:' + i, s.label + ': ' + s.text]));
+  return out;
+}
+function clickToEdit(ev, canvas, lines, pageH) {
+  const r = canvas.getBoundingClientRect();
+  const pdfY = pageH - (ev.clientY - r.top) * (pageH / r.height);
+  const line = lines.reduce((best, l) => Math.abs(l.y - pdfY) < Math.abs((best || { y: 1e9 }).y - pdfY) ? l : best, null);
+  if (!line || Math.abs(line.y - pdfY) > 10) return;
+  const want = norm(line.text.replace(/^[•\s]+/, ''));
+  if (want.length < 6) return setStatus('That line is a heading; click a bullet, the summary or a skills line.', 'warn');
+  const hit = editTargets().find(([, text]) => norm(text).includes(want) || want.includes(norm(text)));
+  if (!hit) return setStatus('That line is a heading; click a bullet, the summary or a skills line.', 'warn');
+  if (cur === 'library' && !hit[0].startsWith('b:')) go(previewTrack());
+  let el = document.querySelector(`[data-key="${hit[0]}"]`);
+  if (!el && cur !== 'library' && cur !== 'doc') { go(previewTrack()); el = document.querySelector(`[data-key="${hit[0]}"]`); }
+  if (!el) return;
+  el.closest('details')?.setAttribute('open', '');
+  el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  el.focus({ preventScroll: true });
+  el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1800);
+  setStatus('Editing that point. The preview updates when you stop typing.', 'ok');
+}
+function previewTrack() { return cur === 'library' ? (localStorageGet('lastTrack') || M.tracks[0].id) : cur; }
+function pdfUrl(tid) { return (tid === 'doc' ? '/pdf?file=' + encodeURIComponent(DOC.file) : '/pdf?track=' + tid) + '&t=' + Date.now(); }
+let showSeq = 0;
+async function showPdf() {
+  const tid = previewTrack(), seq = ++showSeq;
+  if (cur !== 'library' && cur !== 'full' && cur !== 'doc') localStorageSet('lastTrack', cur);
+  const url = pdfUrl(tid);
+  $('#pdfOpen').href = url;
+  const name = tid === 'full' ? 'Full master' : tid === 'doc' ? docLabel() : (M.tracks.find(x => x.id === tid) || {}).name;
+  $('#pdfLabel').textContent = 'Preview: ' + name + ' (updates by itself)';
+  const r = await fetch(url);
+  if (r.status === 404) return build();          // never built yet
+  const data = new Uint8Array(await r.arrayBuffer());
+  if (seq !== showSeq) return;
+  const box = $('#pages');
+  if (!window.pdfjsLib) {                       // CDN not reachable: fall back to the browser viewer
+    box.innerHTML = ''; box.append(h('iframe', { src: url, style: 'width:100%;height:100%;border:0' })); return;
+  }
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  const pdf = await pdfjsLib.getDocument({ data }).promise;
+  const zoom = parseFloat(localStorageGet('zoom') || '1');
+  const width = Math.round((box.clientWidth - 28) * zoom), frag = document.createDocumentFragment();
+  let fit = null;
+  for (let n = 1; n <= pdf.numPages; n++) {
+    const page = await pdf.getPage(n);
+    const base = page.getViewport({ scale: 1 }), scale = width / base.width;
+    // Sharp text: draw at 2x the screen's pixel density (at least 3x) and let the browser scale it down.
+    const px = Math.min(Math.max(3, (window.devicePixelRatio || 1) * 2), 5000 / width);
+    const vp = page.getViewport({ scale: scale * px });
+    const c = document.createElement('canvas'); c.width = Math.floor(vp.width); c.height = Math.floor(vp.height);
+    c.style.width = width + 'px'; c.title = 'Click a line to edit it';
+    await page.render({ canvasContext: c.getContext('2d', { alpha: false }), viewport: vp }).promise;
+    const lines = textLines((await page.getTextContent()).items);
+    c.addEventListener('click', ev => clickToEdit(ev, c, lines, base.height));
+    if (tid !== 'full' && n === 2) frag.append(h('div', { class: 'over' }, '▼ Everything below spills onto page 2'));
+    frag.append(c);
+    if (tid !== 'full') fit = await measure(page, n, base.height, fit);
+  }
+  if (seq !== showSeq) return;
+  const keep = box.scrollTop; box.innerHTML = ''; box.append(frag); box.scrollTop = keep; box.classList.remove('busy');
+  showFit(tid, pdf.numPages, fit);
+}
+// Rough line count: free space at the bottom of page 1, or how many text lines landed on page 2+.
+async function measure(page, n, pageH, fit) {
+  const T = (previewTrack() === 'doc' ? DOC.doc : M.layout[previewTrack()]) || {}, f = T.format || {};
+  const lead = f.leading || 12, bottom = (f.margin ?? 0.5) * 72;
+  const items = (await page.getTextContent()).items.filter(i => i.str.trim());
+  fit = fit || { free: 0, over: 0 };
+  if (n === 1) { const low = Math.min(...items.map(i => i.transform[5])); fit.free = Math.max(0, Math.floor((low - bottom) / lead)); }
+  else fit.over += new Set(items.map(i => Math.round(i.transform[5] / 3))).size;
+  return fit;
+}
+function showFit(tid, pages, fit) {
+  const el = $('#fit');
+  if (tid === 'full') { el.textContent = pages + ' pages (reference)'; el.className = 'fit'; return; }
+  if (pages > 1) { el.textContent = `✗ ${pages} pages: about ${fit.over} line${fit.over === 1 ? '' : 's'} too long`; el.className = 'fit bad'; }
+  else if (fit.free <= 1) { el.textContent = '✓ 1 page (full)'; el.className = 'fit tight'; }
+  else { el.textContent = `✓ 1 page, about ${fit.free} lines free`; el.className = 'fit ok'; }
+}
+function render() {
+  renderTabs();
+  const L = $('#left'); L.innerHTML = '';
+  if (cur === 'library') return renderLibrary(L);
+  if (cur === 'doc') return renderDoc(L);
+  if (cur === 'full') {
+    L.append(h('div', { class: 'card' }, h('h2', {}, 'Full master resume'),
+      h('p', { class: 'help' }, 'Every point in the library on several pages, tagged with the resume types it fits. Use it to read everything you have ever done in one place. It is not meant to be sent. Edit the points in the "Library" tab; this preview rebuilds by itself.')));
+    return;
+  }
+  renderTrack(L, M.layout[cur]);
+}
+
+/* ---------------- one resume type ---------------- */
+function renderTrack(L, T) {
+  const tr = M.tracks.find(x => x.id === cur);
+  L.append(h('div', { class: 'card' },
+    h('h2', {}, tr.name + ' resume'),
+    h('p', { class: 'help' }, 'Choose and order the points for this resume type. Editing a point\'s wording changes it in every resume that uses it. The preview on the right updates by itself about a second after each change, and the badge above it says whether it still fits on one page.'),
+    h('div', { class: 'grid2' },
+      h('label', {}, h('span', { class: 'mute' }, 'Name of this type'), inp(tr.name, v => { tr.name = v; renderTabs(); })),
+      h('label', {}, h('span', { class: 'mute' }, 'Show GPA'), h('select', { onchange: e => { T.show_gpa = e.target.value === 'yes'; mark(); } },
+        h('option', { value: 'no', selected: !T.show_gpa }, 'No'), h('option', { value: 'yes', selected: !!T.show_gpa }, 'Yes')))),
+    h('p', { class: 'help', style: 'margin-top:8px' }, 'Margins, font size and spacing: "⚙ Page layout" above the preview.')
+  ));
+
+  // section order
+  L.append(h('div', { class: 'card' }, h('h2', {}, 'Section order'),
+    h('div', {}, ...T.sections.map((s, i) => h('span', { class: 'chip' }, s,
+      h('button', { class: 'small', onclick: () => { move(T.sections, i, -1); mark(); render(); } }, '↑'),
+      h('button', { class: 'small', onclick: () => { move(T.sections, i, 1); mark(); render(); } }, '↓'),
+      h('button', { class: 'small', title: 'Hide section', onclick: () => { T.sections.splice(i, 1); mark(); render(); } }, '✕'))),
+      ...SECTIONS.filter(s => !T.sections.includes(s)).map(s => h('button', { class: 'small', onclick: () => { T.sections.push(s); mark(); render(); } }, '+ ' + s)))));
+
+  L.append(h('div', { class: 'card' }, h('h2', {}, 'Summary'),
+    h('p', { class: 'help' }, 'Two short, polite lines.'), ta(T.summary || '', v => T.summary = v, 2, 'summary')));
+
+  renderPicks(L, 'Experience', M.experience, T.experience = T.experience || []);
+  renderPicks(L, 'Academic projects', M.projects, T.projects = T.projects || []);
+
+  // education
+  const ec = h('div', { class: 'card' }, h('h2', {}, 'Education: relevant coursework'), h('p', { class: 'help' }, 'Tick 4-5 courses per degree. They print in the order you tick them.'));
+  T.courses = T.courses || {};
+  for (const e of M.education) {
+    const sel = T.courses[e.id] = T.courses[e.id] || [];
+    ec.append(h('div', { class: 'entry' }, h('div', { class: 'ehead' }, h('b', {}, e.school), h('span', { class: 'mute' }, e.degree)),
+      h('div', { class: 'chips' }, ...e.courses.map(c => h('label', {}, h('input', { type: 'checkbox', checked: sel.includes(c),
+        onchange: ev => { if (ev.target.checked) sel.push(c); else sel.splice(sel.indexOf(c), 1); mark(); } }), c)))));
+  }
+  L.append(ec);
+
+  // skills
+  const sc = h('div', { class: 'card' }, h('h2', {}, 'Skills lines'),
+    h('p', { class: 'help' }, 'Each line is "Label: list". The full skill list is in the Library tab; copy from there.'));
+  T.skills = T.skills || [];
+  T.skills.forEach((s, i) => sc.append(h('div', { class: 'row' },
+    h('div', { style: 'width:130px' }, inp(s.label, v => s.label = v, 'Label')),
+    h('div', { class: 'grow' }, ta(s.text, v => s.text = v, 1, 'skill:' + i)),
+    h('div', { class: 'ctl' }, h('button', { class: 'small', onclick: () => { move(T.skills, i, -1); mark(); render(); } }, '↑'),
+      h('button', { class: 'small', onclick: () => { T.skills.splice(i, 1); mark(); render(); } }, '✕')))));
+  sc.append(h('button', { class: 'small', onclick: () => { T.skills.push({ label: 'New', text: '' }); mark(); render(); } }, '+ Add line'));
+  const allSkills = h('details', {}, h('summary', {}, 'Show the full skill list'),
+    ...M.skills.map(s => h('div', { class: 'mute', style: 'margin:3px 0' }, h('b', {}, s.label + ': '), s.text)));
+  sc.append(allSkills);
+  L.append(sc);
+
+  // affiliations
+  T.affiliations = T.affiliations || [];
+  L.append(h('div', { class: 'card' }, h('h2', {}, 'Affiliations line'),
+    h('div', { class: 'chips' }, ...M.affiliations.filter(a => a.short).map(a => h('label', {}, h('input', { type: 'checkbox', checked: T.affiliations.includes(a.id),
+      onchange: ev => { if (ev.target.checked) T.affiliations.push(a.id); else T.affiliations.splice(T.affiliations.indexOf(a.id), 1); mark(); } }), a.short)))));
+}
+
+function renderPicks(L, label, pool, picks) {
+  const card = h('div', { class: 'card' }, h('h2', {}, label));
+  const byId = Object.fromEntries(pool.map(e => [e.id, e]));
+  picks.forEach((p, pi) => {
+    const e = byId[p.id]; if (!e) return;
+    const bmap = Object.fromEntries(e.bullets.map(b => [b.id, b]));
+    p.bullets = (p.bullets || []).filter(id => bmap[id]);
+    const box = h('div', { class: 'entry' });
+    box.append(h('div', { class: 'ehead' }, h('b', {}, e.org), h('span', { class: 'mute' }, e.dates), h('span', { class: 'spacer' }),
+      h('button', { class: 'small', onclick: () => { move(picks, pi, -1); mark(); render(); } }, '↑ move up'),
+      h('button', { class: 'small', onclick: () => { move(picks, pi, 1); mark(); render(); } }, '↓'),
+      h('button', { class: 'small', onclick: () => { picks.splice(pi, 1); mark(); render(); } }, 'Remove')));
+    box.append(h('div', { class: 'row' }, h('span', { class: 'mute', style: 'padding-top:7px;width:90px' }, 'Job title'),
+      h('div', { class: 'grow' }, inp(p.title || '', v => p.title = v, e.title))));
+    p.bullets.forEach((bid, bi) => {
+      const b = bmap[bid];
+      box.append(h('div', { class: 'bul' }, h('span', { class: 'n' }, (bi + 1) + '.'),
+        h('div', { class: 'grow' }, ta(b.text, v => b.text = v, 1, 'b:' + b.id), b.status !== 'ok' ? h('span', { class: 'tag ' + b.status }, b.status === 'confirm' ? 'not confirmed: won\'t print' : 'never use: won\'t print') : null),
+        h('div', { class: 'ctl' },
+          h('button', { class: 'small', title: 'Up', onclick: () => { move(p.bullets, bi, -1); mark(); render(); } }, '↑'),
+          h('button', { class: 'small', title: 'Down', onclick: () => { move(p.bullets, bi, 1); mark(); render(); } }, '↓'),
+          h('button', { class: 'small', title: 'Take off this resume (stays in the library)', onclick: () => { p.bullets.splice(bi, 1); mark(); render(); } }, '✕'))));
+    });
+    const unused = e.bullets.filter(b => !p.bullets.includes(b.id) && b.status !== 'never');
+    const fits = unused.filter(b => (b.tracks || []).includes(cur)), other = unused.filter(b => !(b.tracks || []).includes(cur));
+    const addRow = b => h('div', { class: 'bul unused' }, h('button', { class: 'small', onclick: () => { p.bullets.push(b.id); mark(); render(); } }, '+ add'),
+      h('button', { class: 'small', title: 'Edit this point', onclick: ev => { const row = ev.target.closest('.bul'); const t = ta(b.text, v => b.text = v, 2, 'b:' + b.id); row.querySelector('.txt').replaceWith(h('div', { class: 'grow' }, t)); ev.target.remove(); t.focus(); } }, '✎'),
+      h('span', { class: 'txt' }, b.text, ...(b.tracks || []).map(t => h('span', { class: 'tag' }, t)), b.status !== 'ok' ? h('span', { class: 'tag ' + b.status }, b.status) : null));
+    if (unused.length) box.append(h('details', { open: false }, h('summary', {}, `More points for this job (${fits.length} fit this type, ${other.length} other)`),
+      ...fits.map(addRow), other.length ? h('div', { class: 'mute', style: 'margin:6px 0 2px' }, 'Tagged for other types:') : null, ...other.map(addRow),
+      h('button', { class: 'small', style: 'margin-top:6px', onclick: () => {
+        const nb = { id: e.id + '-' + Date.now().toString(36), text: 'New point', tracks: [cur], status: 'ok', note: 'added in editor' };
+        e.bullets.push(nb); p.bullets.push(nb.id); mark(); render(); } }, '+ Write a new point')));
+    card.append(box);
+  });
+  const missing = pool.filter(e => !picks.some(p => p.id === e.id));
+  if (missing.length) card.append(h('div', { style: 'margin-top:10px' }, h('span', { class: 'mute' }, 'Add: '),
+    ...missing.map(e => h('button', { class: 'small', style: 'margin:2px', onclick: () => {
+      picks.push({ id: e.id, bullets: e.bullets.filter(b => b.status === 'ok' && (b.tracks || []).includes(cur)).slice(0, 3).map(b => b.id) }); mark(); render(); } }, '+ ' + e.org))));
+  L.append(card);
+}
+
+/* ---------------- a tailored resume (output/cv-*.tex) ---------------- */
+function btn(label, fn, title) { return h('button', { class: 'small', title: title || null, onclick: () => { if (fn() !== false) { mark(); render(); } } }, label); }
+function findBy(pool, field, value) {
+  const v = norm(value);
+  return v ? pool.find(m => { const x = norm(m[field]); return x && (x === v || v.includes(x) || x.includes(v)); }) : null;
+}
+function renderDoc(L) {
+  const D = DOC.doc;
+  L.append(h('div', { class: 'card' }, h('h2', {}, '✎ ' + docLabel()),
+    h('p', { class: 'help' }, 'This is the resume career-ops tailored for this job. Every change saves straight into ' + DOC.file +
+      '.pdf about a second after you stop typing, so "View tailored CV", Apply and the autofill extension all use your edited version. The version from before you started editing is kept in output/old-versions/edited-in-editor-<date>/.'),
+    h('p', { class: 'help' }, 'Add points from your master library under each job, or write your own. Click any line in the preview to jump to it.'),
+    DOC.report ? h('div', { class: 'mute' }, 'Report: ' + DOC.report) : null));
+  L.append(h('div', { class: 'card' }, h('h2', {}, 'Section order'),
+    h('div', {}, ...D.sections.map((s, i) => h('span', { class: 'chip' }, s.name,
+      btn('↑', () => move(D.sections, i, -1)), btn('↓', () => move(D.sections, i, 1)),
+      btn('✕', () => confirm('Remove the ' + s.name + ' section from this resume?') ? void D.sections.splice(i, 1) : false, 'Remove this section'))))));
+  D.sections.forEach((sec, si) => L.append(renderDocSection(sec, si)));
+}
+
+function renderDocSection(sec, si) {
+  const card = h('div', { class: 'card' }, h('h2', {}, sec.name));
+  const t = sec.type;
+  if (t === 'summary') {
+    card.append(h('p', { class: 'help' }, 'Two short, polite lines.'), ta(sec.text, v => sec.text = v, 2, 'summary'));
+  } else if (t === 'entries') {
+    const pool = /PROJECT/i.test(sec.name) ? M.projects : M.experience;
+    sec.entries.forEach((e, ei) => {
+      const box = h('div', { class: 'entry' });
+      box.append(h('div', { class: 'ehead' }, h('b', {}, e.org), h('span', { class: 'mute' }, e.dates), h('span', { class: 'spacer' }),
+        btn('↑ move up', () => move(sec.entries, ei, -1)), btn('↓', () => move(sec.entries, ei, 1)),
+        btn('Remove', () => confirm('Remove ' + e.org + ' from this resume?') ? void sec.entries.splice(ei, 1) : false)));
+      box.append(h('div', { class: 'grid2' },
+        h('label', {}, h('span', { class: 'mute' }, 'Organization'), inp(e.org, v => e.org = v)),
+        h('label', {}, h('span', { class: 'mute' }, 'Job title'), inp(e.title, v => e.title = v, '(no title line)')),
+        h('label', {}, h('span', { class: 'mute' }, 'Location'), inp(e.location, v => e.location = v)),
+        h('label', {}, h('span', { class: 'mute' }, 'Dates'), inp(e.dates, v => e.dates = v))));
+      e.bullets.forEach((b, bi) => box.append(h('div', { class: 'bul' }, h('span', { class: 'n' }, (bi + 1) + '.'),
+        h('div', { class: 'grow' }, ta(b, v => e.bullets[bi] = v, 1, `d:${si}:${ei}:${bi}`)),
+        h('div', { class: 'ctl' }, btn('↑', () => move(e.bullets, bi, -1)), btn('↓', () => move(e.bullets, bi, 1)),
+          btn('✕', () => void e.bullets.splice(bi, 1), 'Take this point off this resume')))));
+      const m = findBy(pool, 'org', e.org), have = new Set(e.bullets.map(norm));
+      const extra = m ? m.bullets.filter(b => b.status === 'ok' && !have.has(norm(b.text))) : [];
+      const lib = h('details', {}, h('summary', {}, m ? `Add a point from your library (${extra.length} more for this job)` : 'Add a point'),
+        ...extra.map(b => h('div', { class: 'bul unused' }, btn('+ add', () => void e.bullets.push(b.text)),
+          h('span', { class: 'txt' }, b.text, ...(b.tracks || []).map(x => h('span', { class: 'tag' }, x))))),
+        m ? null : h('div', { class: 'mute' }, 'This job is not in your master library, so there are no saved points to pick from.'),
+        h('div', { style: 'margin-top:6px' }, btn('+ Write a new point', () => void e.bullets.push('New point'))));
+      box.append(lib);
+      card.append(box);
+    });
+    const missing = pool.filter(m => !sec.entries.some(e => findBy([m], 'org', e.org)));
+    if (missing.length) card.append(h('div', { style: 'margin-top:10px' }, h('span', { class: 'mute' }, 'Add from library: '),
+      ...missing.map(m => btn('+ ' + m.org, () => void sec.entries.push({ org: m.org, location: m.location || '', title: m.title || '', dates: m.dates || '',
+        kind: (sec.entries[0] || {}).kind || 'job', bullets: m.bullets.filter(b => b.status === 'ok').slice(0, 2).map(b => b.text) })))));
+  } else if (t === 'education') {
+    sec.entries.forEach((e, ei) => {
+      const m = findBy(M.education, 'school', e.school);
+      const has = norm(e.courses);
+      const box = h('div', { class: 'entry' }, h('div', { class: 'grid2' },
+        h('label', {}, h('span', { class: 'mute' }, 'School'), inp(e.school, v => e.school = v)),
+        h('label', {}, h('span', { class: 'mute' }, 'Degree'), inp(e.degree, v => e.degree = v)),
+        h('label', {}, h('span', { class: 'mute' }, 'Location'), inp(e.location, v => e.location = v)),
+        h('label', {}, h('span', { class: 'mute' }, 'Dates'), inp(e.dates, v => e.dates = v))),
+        h('label', {}, h('span', { class: 'mute' }, 'Relevant coursework'), ta(e.courses || '', v => e.courses = v, 1, `dc:${si}:${ei}`)),
+        m ? h('div', { class: 'chips' }, h('span', { class: 'mute' }, 'Add: '), ...m.courses.filter(c => !has.includes(norm(c))).map(c =>
+          btn('+ ' + c, () => { e.courses = e.courses ? e.courses.replace(/\s*$/, '') + ', ' + c : c; }))) : null);
+      card.append(box);
+    });
+  } else if (t === 'skills') {
+    sec.lines.forEach((l, li) => card.append(h('div', { class: 'row' },
+      h('div', { style: 'width:130px' }, inp(l.label, v => l.label = v, 'Label')),
+      h('div', { class: 'grow' }, ta(l.text, v => l.text = v, 1, `ds:${si}:${li}`)),
+      h('div', { class: 'ctl' }, btn('↑', () => move(sec.lines, li, -1)), btn('✕', () => void sec.lines.splice(li, 1))))));
+    card.append(btn('+ Add line', () => void sec.lines.push({ label: 'New', text: '' })));
+    card.append(h('details', {}, h('summary', {}, 'Your full skill list (click to add a line)'),
+      ...M.skills.map(s => h('div', { class: 'bul unused' }, btn('+ add', () => void sec.lines.push({ label: s.label, text: s.text })),
+        h('span', { class: 'txt' }, h('b', {}, s.label + ': '), s.text)))));
+  } else if (t === 'list') {
+    sec.items.forEach((x, i) => card.append(h('div', { class: 'row' }, h('div', { class: 'grow' }, inp(x, v => sec.items[i] = v)),
+      btn('✕', () => void sec.items.splice(i, 1)))));
+    const have = sec.items.map(norm);
+    card.append(h('div', { class: 'chips' }, h('span', { class: 'mute' }, 'Add: '),
+      ...M.affiliations.filter(a => a.short && !have.includes(norm(a.short))).map(a => btn('+ ' + a.short, () => void sec.items.push(a.short))),
+      btn('+ Other', () => void sec.items.push('New item'))));
+  } else if (t === 'paras' || t === 'bullets') {
+    sec.items.forEach((x, i) => card.append(h('div', { class: 'bul' }, h('span', { class: 'n' }, (i + 1) + '.'),
+      h('div', { class: 'grow' }, ta(x, v => sec.items[i] = v, 1, `${t === 'paras' ? 'dp' : 'db'}:${si}:${i}`)),
+      h('div', { class: 'ctl' }, btn('↑', () => move(sec.items, i, -1)), btn('↓', () => move(sec.items, i, 1)), btn('✕', () => void sec.items.splice(i, 1))))));
+    card.append(h('p', { class: 'help', style: 'margin-top:6px' }, 'Use **double stars** around words to make them bold.'),
+      btn('+ Add line', () => void sec.items.push('New line')));
+  } else {
+    card.append(h('p', { class: 'help' }, 'This section has a layout the editor can\'t split into points, so here you edit its LaTeX directly. Keep the backslash commands as they are and change the words.'),
+      ta(sec.tex, v => sec.tex = v, 4));
+  }
+  return card;
+}
+
+/* ---------------- library: every point ---------------- */
+function renderLibrary(L) {
+  L.append(h('div', { class: 'card' }, h('h2', {}, 'Library: every point you have'),
+    h('p', { class: 'help' }, 'This is the master. Tags say which resume types a point fits; the AI uses them when tailoring. "Not confirmed" points never print on a track resume until you mark them OK. "Never use" points are kept only as a record.')));
+  for (const [label, pool] of [['Experience', M.experience], ['Academic projects', M.projects]]) {
+    const card = h('div', { class: 'card' }, h('h2', {}, label));
+    pool.forEach((e, ei) => {
+      const box = h('div', { class: 'entry' });
+      box.append(h('div', { class: 'grid2' },
+        h('label', {}, h('span', { class: 'mute' }, 'Organization'), inp(e.org, v => e.org = v)),
+        h('label', {}, h('span', { class: 'mute' }, 'Title'), inp(e.title, v => e.title = v)),
+        h('label', {}, h('span', { class: 'mute' }, 'Location'), inp(e.location, v => e.location = v)),
+        h('label', {}, h('span', { class: 'mute' }, 'Dates'), inp(e.dates, v => e.dates = v))));
+      if (e.note) box.append(h('div', { class: 'mute', style: 'margin:4px 0' }, 'Note: ' + e.note));
+      e.bullets.forEach((b, bi) => {
+        box.append(h('div', { class: 'bul' }, h('span', { class: 'n' }, (bi + 1) + '.'),
+          h('div', { class: 'grow' }, ta(b.text, v => b.text = v, 1, 'b:' + b.id),
+            h('div', { class: 'chips' },
+              ...M.tracks.map(t => h('label', {}, h('input', { type: 'checkbox', checked: (b.tracks || []).includes(t.id), onchange: ev => {
+                b.tracks = b.tracks || []; if (ev.target.checked) b.tracks.push(t.id); else b.tracks.splice(b.tracks.indexOf(t.id), 1); mark(); } }), t.name)),
+              h('select', { style: 'width:auto', onchange: ev => { b.status = ev.target.value; mark(); render(); } },
+                ...[['ok', 'OK to use'], ['confirm', 'Not confirmed'], ['never', 'Never use']].map(([v, t]) => h('option', { value: v, selected: (b.status || 'ok') === v }, t)))),
+            b.note || b.source ? h('div', { class: 'mute' }, [b.note, b.source ? 'from: ' + b.source : ''].filter(Boolean).join(' · ')) : null),
+          h('div', { class: 'ctl' },
+            h('button', { class: 'small', onclick: () => { move(e.bullets, bi, -1); mark(); render(); } }, '↑'),
+            h('button', { class: 'small', onclick: () => { move(e.bullets, bi, 1); mark(); render(); } }, '↓'),
+            h('button', { class: 'small', title: 'Delete everywhere', onclick: () => {
+              if (!confirm('Delete this point from the library and every resume?')) return;
+              e.bullets.splice(bi, 1); for (const T of Object.values(M.layout)) for (const p of [...(T.experience || []), ...(T.projects || [])]) p.bullets = (p.bullets || []).filter(x => x !== b.id);
+              mark(); render(); } }, '🗑'))));
+      });
+      box.append(h('button', { class: 'small', onclick: () => { e.bullets.push({ id: e.id + '-' + Date.now().toString(36), text: 'New point', tracks: [], status: 'ok', note: 'added in editor' }); mark(); render(); } }, '+ Add point'));
+      card.append(box);
+    });
+    card.append(h('button', { style: 'margin-top:10px', onclick: () => {
+      const org = prompt('Organization (or project name)?'); if (!org) return;
+      pool.push({ id: slug(org) + '-' + Date.now().toString(36).slice(-3), org, title: '', location: '', dates: '', bullets: [] }); mark(); render(); } }, '+ Add ' + (label === 'Experience' ? 'job' : 'project')));
+    L.append(card);
+  }
+  const ed = h('div', { class: 'card' }, h('h2', {}, 'Education'));
+  for (const e of M.education) ed.append(h('div', { class: 'entry' }, h('div', { class: 'grid2' },
+    h('label', {}, h('span', { class: 'mute' }, 'School'), inp(e.school, v => e.school = v)),
+    h('label', {}, h('span', { class: 'mute' }, 'Degree'), inp(e.degree, v => e.degree = v)),
+    h('label', {}, h('span', { class: 'mute' }, 'Location'), inp(e.location, v => e.location = v)),
+    h('label', {}, h('span', { class: 'mute' }, 'Dates'), inp(e.dates, v => e.dates = v))),
+    h('label', {}, h('span', { class: 'mute' }, 'All courses (one per line)'), ta(e.courses.join('\n'), v => e.courses = v.split('\n').map(s => s.trim()).filter(Boolean), 4))));
+  L.append(ed);
+  const sk = h('div', { class: 'card' }, h('h2', {}, 'Full skill list'));
+  M.skills.forEach((s, i) => sk.append(h('div', { class: 'row' }, h('div', { style: 'width:150px' }, inp(s.label, v => s.label = v)), h('div', { class: 'grow' }, ta(s.text, v => s.text = v, 1, 'libskill:' + i)),
+    h('button', { class: 'small', onclick: () => { M.skills.splice(i, 1); mark(); render(); } }, '✕'))));
+  sk.append(h('button', { class: 'small', onclick: () => { M.skills.push({ id: 'skill-' + Date.now().toString(36), label: 'New', text: '' }); mark(); render(); } }, '+ Add line'));
+  L.append(sk);
+  const af = h('div', { class: 'card' }, h('h2', {}, 'Affiliations and other facts'), h('p', { class: 'help' }, 'Short = how it prints on the one-line Affiliations section (leave empty for facts that only go in cover letters).'));
+  M.affiliations.forEach((a, i) => af.append(h('div', { class: 'row' }, h('div', { class: 'grow' }, ta(a.text, v => a.text = v)), h('div', { style: 'width:220px' }, inp(a.short || '', v => a.short = v, 'short form')),
+    h('button', { class: 'small', onclick: () => { M.affiliations.splice(i, 1); mark(); render(); } }, '✕'))));
+  af.append(h('button', { class: 'small', onclick: () => { M.affiliations.push({ id: 'aff-' + Date.now().toString(36), text: '', short: '' }); mark(); render(); } }, '+ Add'));
+  L.append(af);
+}
+
+function newTrack() {
+  const name = prompt('Name of the new resume type (e.g. Estimating):'); if (!name) return;
+  const id = slug(name); if (!id || M.layout[id]) return alert('That name is taken.');
+  const base = M.layout[cur] || M.layout[M.tracks[0].id];
+  M.tracks.push({ id, name }); M.layout[id] = JSON.parse(JSON.stringify(base));
+  mark(); go(id);
+}
+
+// Save the master and rebuild the previewed resume in one call. If more edits arrive meanwhile, run once more.
+async function build() {
+  clearTimeout(timer);
+  if (building) { again = true; return; }
+  building = true; $('#pages').classList.add('busy'); setStatus('Saving and building…');
+  const tid = previewTrack(), isDoc = tid === 'doc', sent = JSON.stringify(isDoc ? DOC.doc : M);
+  try {
+    const r = isDoc
+      ? await fetch('/api/doc-save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ file: DOC.file, doc: DOC.doc }) })
+      : await fetch('/api/save-build', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ master: M, track: tid }) });
+    const j = await r.json();
+    if (!r.ok || j.error) { setStatus('Problem: ' + (j.error || r.status), 'bad'); $('#pages').classList.remove('busy'); }
+    else { if (JSON.stringify(isDoc ? DOC.doc : M) === sent) dirty = false; setStatus(isDoc ? 'Saved into ' + DOC.file + '.pdf ✓' : 'Saved ✓', 'ok'); await showPdf(); }
+  } catch (e) { setStatus('Editor server not reachable: ' + e.message, 'bad'); }
+  building = false;
+  if (again) { again = false; build(); }
+}
+window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); build(); } });
+load();
+</script>
+</body>
+</html>

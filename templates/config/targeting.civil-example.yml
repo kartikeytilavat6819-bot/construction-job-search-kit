@@ -1,0 +1,322 @@
+# =====================================================================================================
+#  targeting.civil-example.yml : the ORIGINAL civil-engineering values these scripts were tuned with
+# =====================================================================================================
+#
+#  Reference only. This shows how the filters were set for an entry-level CIVIL engineer (transportation,
+#  water/wastewater, site/civil, construction inspection; no geotechnical, structural, bridge or marine
+#  work) so you can see how each setting is used. To use it, copy it to config/targeting.yml.
+#  See templates/config/targeting.yml for the explanation of every section.
+#
+#  Big differences from the construction-management version:
+#   * estimator, scheduler, safety coordinator and superintendent titles are REJECTED here (off-target
+#     for a design engineer) but are TARGETS for construction management;
+#   * structural / geotechnical / bridge / marine / power work is rejected, even inside "engineer" titles;
+#   * the skills list is civil design and traffic software (Civil 3D, Synchro, ArcGIS ...).
+# =====================================================================================================
+
+field: "civil engineering (transportation / traffic, water / wastewater, site / civil, construction inspection)"
+
+candidate:
+  graduation: "Dec 2026"
+  work_authorization: "on F-1 OPT; will need H-1B sponsorship later"
+
+location:
+  home_metro:
+    label: "Boston area"
+    towns: [boston, cambridge, somerville, watertown, newton, waltham, woburn, burlington, lexington, bedford,
+            chelmsford, lowell, tewksbury, andover, wilmington, reading, wakefield, medford, malden, everett,
+            chelsea, revere, winthrop, lynn, salem, peabody, danvers, beverly, quincy, braintree, weymouth,
+            hingham, milton, dedham, westwood, norwood, canton, needham, wellesley, brookline, arlington,
+            belmont, natick, framingham, marlborough, foxborough, mansfield, worcester, hanscom]
+  home_state:
+    code: MA
+    name: Massachusetts
+  region:
+    label: "New England"
+    states: [CT, RI, NH, VT, ME]
+  scores:
+    home_metro: 5.0
+    home_state: 4.6
+    region: 4.4
+    other_us: 4.0
+    unknown: 3.8
+    remote: 3.0
+
+priority_companies:
+  - HNTB
+  - VHB
+  - Tighe & Bond
+
+public_agency_words:
+  - commonwealth
+  - mbta
+  - mwra
+  - city of
+  - town of
+
+titles:
+  entry_signals:
+    - entry
+    - junior
+    - jr
+    - new grad
+    - graduate
+    - associate
+    - assistant
+    - engineer i
+    - engineer 1
+    - eit
+    - engineer in training
+    - field engineer
+    - staff engineer
+    - early career
+    - "2026"
+    - "2027"
+  target:
+    - transport*
+    - traffic
+    - transit
+    - highway
+    - roadway
+    - signal*
+    - rail
+    - water
+    - wastewater
+    - stormwater
+    - drainage
+    - hydraul*
+    - civil
+    - site
+    - land development
+    - construction
+    - field
+    - inspector
+    - gis
+  stretch:
+    - 're:project\s+engineer(?!\s*(1|i)\b)'
+    - resident engineer
+    - specialist
+    - consultant
+    - planner
+  too_senior:
+    - intern
+    - internship
+    - co-op
+    - coop
+    - senior
+    - sr
+    - lead
+    - principal
+    - manager
+    - director
+    - supervisor
+    - superintendent
+    - chief
+    - professional engineer
+    - project manager
+    - department manager
+  reject_level_2_plus: true
+  senior_ok_with_entry_signal:
+    - lead
+    - manager
+  off_discipline:
+    - structural
+    - geotech*
+    - bridge
+    - marine
+    - coastal
+    - waterfront
+    - electrical
+    - mechanical
+    - architect*
+    - transmission
+    - substation
+    - overhead line
+    - overhead distribution
+    - distribution line
+    - power delivery
+  exclude:
+    - accountant
+    - accounting
+    - payroll
+    - recruit*
+    - talent acquisition
+    - sales
+    - marketing
+    - business development
+    - nurse
+    - driver
+    - cdl
+    - laborer
+    - carpenter
+    - electrician
+    - plumber
+    - welder
+    - mechanic
+    - warehouse
+    - receptionist
+    - administrative
+    - admin assistant
+    - office assistant
+    - paralegal
+    - attorney
+    - counsel
+    - geologist
+    - hydrogeologist
+    - biologist
+    - chemist
+    - ecologist
+    - archaeolog*
+    - wildlife
+    - botanist
+    - hr
+    - human resources
+    - customer service
+    - cashier
+    - janitor
+    - custodian
+    - software engineer
+    - software developer
+    - developer
+    - devops
+    - data scientist
+    - it support
+    - help desk
+    - graphic designer
+    - interior designer
+    - landscape architect
+    - mep
+    - hvac
+    - instrumentation
+    - controls engineer
+    - process engineer
+    - chemical engineer
+    - mining engineer
+    - petroleum
+    - substation
+    - transmission line
+    - protection engineer
+    - power engineer
+    - telecom
+    - fiber
+    - rf engineer
+    - surveyor
+    - survey technician
+    - cad technician
+    - drafter
+    - estimator
+    - scheduler
+    - safety manager
+    - safety coordinator
+    - safety specialist
+    - quality manager
+    - operator
+    - finance
+    - financial analyst
+    - procurement
+    - purchasing
+    - buyer
+    - legal
+  exclude_unless:
+    - engineer*
+    - eit
+    - inspector
+    - designer
+  too_junior:
+    - technician*
+    - tech
+    - locator
+    - ehs
+    - environmental health
+    - process designer
+    - drafter
+    - draftsperson
+    - cad tech*
+  too_junior_keep_if:
+    - design*
+    - engineering tech*
+    - signal*
+    - inspector
+    - bim
+  too_junior_never_keep:
+    - material*
+    - testing
+    - lab
+    - survey*
+    - locat*
+    - maintenance
+    - plant
+    - fleet
+    - field service
+    - management center
+    - process
+
+skills:
+  "civil 3d | civil3d": 1.0
+  "autocad": 0.8
+  "microstation": 0.8
+  "openroads": 0.8
+  "bluebeam": 0.4
+  "arcgis | gis | qgis | arcpy": 0.9
+  "python": 0.6
+  "power bi | power apps": 0.3
+  "excel": 0.2
+  "vissim | synchro | simtraffic | sumo | hcm | highway capacity": 1.0
+  "traffic signal* | traffic engineering | traffic impact | traffic study | traffic studies | traffic analysis | traffic operations | traffic count* | signal timing | level of service": 1.0
+  "transportation planning | transportation engineering | roadway design | highway design | geometric design": 0.9
+  "stormwater | drainage | hydraulic* | hydrolog*": 0.8
+  "water distribution | water main* | sewer* | wastewater | water resources": 0.9
+  "site design | site development | site civil | grading | land development | utility design": 0.8
+  "construction inspection | construction observation | construction management | construction phase | construction administration | field inspection | inspect*": 0.9
+  "field engineer | daily report* | submittal* | rfi* | as built* | punch list | shop drawing*": 0.9
+  "quantit* | take off* | takeoff* | cost estimat*": 0.5
+  "permit*": 0.4
+  "asset management | asset inventory": 0.5
+  "eit | engineer in training | fundamentals of engineering | fe exam": 0.6
+
+jd:
+  on_target_terms: [transportation, traffic, roadway, highway, transit, rail, water, sewer, stormwater, drainage,
+                    site civil, land development, grading, construction, inspection, field engineer, civil]
+  off_target_terms: [geotechnical, soil boring, foundation design, structural design, structural analysis,
+                     structural engineer, steel design, concrete design, bridge, pile*, marine, coastal, waterfront,
+                     dredg*, electrical, mechanical, hvac, plumbing, substation, transmission line, power plant,
+                     architect, semiconductor, software develop*, falsework, shoring, temporary works, risa, larsa,
+                     materials testing, nuclear density, nuclear gauge, special inspect*, soil testing, soils testing,
+                     proctor, compaction testing]
+  entry_terms:
+    - engineer in training
+    - eit
+    - engineer i
+  penalty:
+    terms: [substation, transmission line, transmission structure, overhead line, bus support*, power delivery,
+            steel pole*, utility scale solar]
+    min_hits: 2
+    points: 0.8
+    note: "power / substation work"
+  degree_fields: [civil, engineering, construction]
+
+rules:
+  max_years_required: 2
+  pe_license_required_is_blocker: true
+
+disciplines:
+  target: [transportation_traffic, highway_roadway, water_wastewater, stormwater_drainage, site_civil,
+           construction_field_inspection, construction_management_estimating, civil_data_gis]
+  neutral: [environmental, surveying]
+  off_target: [geotechnical, structural_bridge, marine_coastal, electrical_mechanical_mep, software_it]
+
+scoring:
+  gold_at: 4.0
+  silver_at: 3.3
+  rules_only_gold_at: 3.9
+  rules_only_silver_at: 3.0
+
+ai:
+  employer: "a US civil engineering firm"
+  entry_level_titles: "Engineer I, EIT, Staff Engineer 1, Field Engineer, Inspector, New Grad, Associate/Assistant Engineer, Designer"
+  off_target_work: "geotechnical / structural / bridge / waterfront-marine design as the primary discipline; an electrical / mechanical / architecture / pure software-IT role"
+  discipline_hints: "a construction/CEI/field inspector is construction_field_inspection; a utility or water GIS role is civil_data_gis"
+  degree_note: "a civil engineering degree counts for construction management, construction engineering, architectural engineering or any engineering field"
+  learnable_software: [Procore, Primavera, Bluebeam, HCSS, Viewpoint, specific CAD add-ons]
+  obtainable_certifications: [OSHA, CTQP, NICET, ACI, EIT/FE, PE later, driver's license]
+  red_flags: "\"Engineer II\" or 2+ years preferred; a must-have state-DOT standard the candidate lacks; heavy structural/geotech share; a start date that does not fit the graduation date"

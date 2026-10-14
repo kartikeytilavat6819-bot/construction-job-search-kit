@@ -1,0 +1,880 @@
+# Portal scanner config - CONSTRUCTION MANAGEMENT starter version
+# (entry-level Project Engineer / APM / Field Engineer / Estimator / Owner's Rep, Boston first, then the US).
+#
+# USER LAYER: career-ops updates never overwrite this file. It is yours to edit.
+# Check it after editing:            node validate-portals.mjs
+# Check that every board answers:     node audit-portals.mjs --summary
+# Add a company: append it to tracked_companies with its careers_url (and provider:/api: if it is not
+# detected automatically - see docs/SUPPORTED_JOB_BOARDS.md). "enabled: false" pauses an entry.
+#
+# Each company comment notes its H-1B history from the US Department of Labor data (FY2020-2026, via the
+# h1b-sponsor plugin, looked up 2026-10-14): "strong" = many recent filings, "weak" = a few, "none found" =
+# no filings under that name. "None found" does not prove a firm never sponsors - ask early.
+
+# How old a posting can be and still be picked up. 90 days keeps the "2027 new grad" campus postings
+# that GCs (Turner, Suffolk, Gilbane...) leave open for months.
+max_posting_age_days: 90
+
+scan_history:
+  recheck_after_days: 30
+
+# F-1 OPT -> needs H-1B later: drop postings whose description explicitly refuses sponsorship
+# ("no visa sponsorship", "U.S. citizens and permanent residents only", ...). Jobs with no description in
+# the board feed always pass; every evaluation still checks sponsorship (modes/_profile.md).
+visa_filter:
+  enabled: true
+
+# Job TITLE filter. A title must contain at least one "positive" phrase and no "negative" phrase.
+# Matching ignores upper/lower case and matches parts of words ("Estimat" would match "Estimator").
+#   word:XYZ  = whole word only (word:APM does not match "APMs" or "Rapid")
+#   "A + B"   = the title must contain BOTH A and B
+# Negatives always win, so "Manager" is NOT a negative (it would also remove "Assistant Project Manager").
+# Plain senior titles ("Project Manager", "Superintendent", "Estimator" with 5+ years) are caught later
+# by the evaluation's "3+ years = fail" rule.
+title_filter:
+  positive:
+    # -- project engineering (the #1 entry title at GCs) --
+    - "Project Engineer"
+    - "Assistant Project Engineer"
+    - "Field Engineer"
+    - "Field Coordinator"
+    - "Site Engineer"
+    - "Construction Engineer"
+    - "Office Engineer"
+    # -- project management (entry level only) --
+    - "Assistant Project Manager"
+    - "Associate Project Manager"
+    - "Junior Project Manager"
+    - "Assistant Construction Manager"
+    - "word:APM"
+    - "Project Coordinator"
+    - "Construction Coordinator"
+    - "Project Analyst"
+    - "Project Manager + word:I"
+    # -- field operations --
+    - "Assistant Superintendent"
+    - "Assistant Super"
+    - "Superintendent Trainee"
+    - "Superintendent + Trainee"
+    # -- estimating / preconstruction --
+    - "Estimator"
+    - "Estimating"
+    - "Preconstruction"
+    - "Pre-construction"
+    - "Quantity Surveyor"
+    - "Cost Estimator"
+    # -- project controls --
+    - "Scheduler"
+    - "Scheduling"
+    - "Project Controls"
+    - "Project Control"
+    - "Planning Engineer"
+    - "Project Planner"
+    - "Cost Engineer"
+    - "Cost Control"
+    - "Assistant Cost Manager"
+    - "Associate Cost Manager"
+    - "Junior Cost"
+    # -- owner's rep / program management --
+    - "Owner's Rep"
+    - "Owner’s Rep"
+    - "Owners Rep"
+    - "Owner Rep"
+    - "Owner's Project"
+    - "Owner’s Project"
+    - "Owners Project"
+    - "Program Management + Associate"
+    - "Program Coordinator + Construction"
+    - "Construction Management"
+    - "Construction Manager + Assistant"
+    - "Construction Admin"
+    # -- inspection / quality --
+    - "Construction Inspector"
+    - "Inspector"
+    - "Quality Control"
+    - "word:QA/QC"
+    - "word:QC"
+    - "Resident Engineer"
+    # -- VDC / BIM --
+    - "word:VDC"
+    - "word:BIM"
+    - "Virtual Design"
+    # -- new-grad programs --
+    - "New Grad"
+    - "Recent Grad"
+    - "Graduate Program"
+    - "Early Career"
+    - "Entry Level"
+    - "Entry-Level"
+    - "Rotational"
+    - "Development Program + Construction"
+    - "Construction + Trainee"
+    - "Construction + Associate"
+    - "Construction + Junior"
+  negative:
+    # -- too senior --
+    - "Senior"
+    - "word:Sr"
+    - "word:Lead"
+    - "Principal"
+    - "Director"
+    - "word:Chief"
+    - "Head of"
+    - "Vice President"
+    - "word:VP"
+    - "Executive"
+    - "General Superintendent"
+    - "Senior Superintendent"
+    - "Experienced"
+    - "Mid-Level"
+    - "Mid Level"
+    - "word:III"
+    - "word:IV"
+    - "word:3"
+    - "word:4"
+    - "word:5"
+    # Remove the next two lines if you also want "Level II" roles (usually 2-4 years).
+    - "word:II"
+    - "word:2"
+    # -- not full-time --
+    - "word:Intern"
+    - "word:Interns"
+    - "Internship"
+    - "Co-op"
+    - "Returning"
+    - "Seasonal"
+    # -- design / engineering disciplines that are not CM --
+    - "Structur"
+    - "Geotech"
+    - "Architect"
+    - "Interior"
+    - "Electrical Engineer"
+    - "Mechanical Engineer"
+    - "Electrical Designer"
+    - "Mechanical Designer"
+    - "Process Engineer"
+    - "Software"
+    - "Developer"
+    - "Data Scientist"
+    - "Cyber"
+    - "Network"
+    - "Systems Engineer"
+    - "Help Desk"
+    - "IT Project"
+    - "word:IT"
+    # -- trades / labor / maintenance --
+    - "Laborer"
+    - "Labourer"
+    - "Carpenter"
+    - "Electrician"
+    - "Plumber"
+    - "Pipefitter"
+    - "Ironworker"
+    - "Welder"
+    - "Operator"
+    - "Foreman"
+    - "Driver"
+    - "Mechanic"
+    - "Technician"
+    - "Apprentice"
+    - "Craft"
+    - "Building Engineer"
+    - "Stationary Engineer"
+    - "Maintenance"
+    - "Janitor"
+    - "Custodian"
+    - "word:HVAC"
+    # -- office functions that are not CM --
+    - "Accountant"
+    - "Accounting"
+    - "Payroll"
+    - "Accounts Payable"
+    - "Human Resources"
+    - "Recruit"
+    - "Marketing"
+    - "word:Sales"
+    - "Business Development"
+    - "Proposal"
+    - "Legal"
+    - "Counsel"
+    - "Attorney"
+    - "Receptionist"
+    - "Insurance"
+    - "Underwriter"
+    - "Clinical"
+    - "Nurse"
+    - "Health Inspector"
+    - "Food"
+    - "Bus Inspector"
+    - "Fire Inspector"
+    - "Elevator"
+    # -- citizenship / clearance jobs (not open to F-1/H-1B) --
+    - "Clearance"
+    - "TS/SCI"
+    - "Secret"
+    - "Department of Defense"
+    # -- non-US --
+    - "word:UK"
+    - "United Kingdom"
+    - "Canada"
+    - "Gestionnaire"
+    - "Ingeniero"
+
+location_filter:
+  # Any US location (you will relocate; the Boston area is ranked first by modes/_profile.md scoring).
+  # No allow list = everything passes except the blocks below; postings with no location also pass.
+  block_hard:
+    - "GB."              # AtkinsRealis writes UK offices as GB.<city>.<site>
+    - "India"
+    - "United Kingdom"
+    - "Scotland"
+    - "Ireland"
+    - "Canada"
+    - "Ontario"
+    - "Quebec"
+    - "Alberta"
+    - "British Columbia"
+    - "Manitoba"
+    - "Saskatchewan"
+    - "Nova Scotia"
+    - "Australia"
+    - "New Zealand"
+    - "Philippines"
+    - "Germany"
+    - "Netherlands"
+    - "France"
+    - "Spain"
+    - "Poland"
+    - "Panama"
+    - "Mexico"
+    - "Colombia"
+    - "Brazil"
+    - "Saudi"
+    - "Qatar"
+    - "United Arab Emirates"
+    - "Dubai"
+    - "Singapore"
+    - "Hong Kong"
+    - "China"
+    - "Japan"
+    - "Korea"
+    # added 2026-10-07: foreign postings written as a bare city/region slipped through after the US-wide switch
+    - "Malaysia"
+    - "Indonesia"
+    - "Thailand"
+    - "Vietnam"
+    - "Taiwan"
+    - "Oman"
+    - "Kuwait"
+    - "Bahrain"
+    - "Egypt"
+    - "UAE"
+    - "Abu Dhabi"
+    - "Chile"
+    - "Peru"
+    - "Argentina"
+    - "South Africa"
+    - "Nigeria"
+    - "Kenya"
+    - "Israel"
+    - "Turkey"
+    - "Italy"
+    - "Sweden"
+    - "Norway"
+    - "Denmark"
+    - "Finland"
+    - "Belgium"
+    - "Switzerland"
+    - "Austria"
+    - "Portugal"
+    - "Greece"
+    - "Romania"
+    - "Czech"
+    - "Hungary"
+  # A job naming a US state/'US' is always kept; this rescues Manchester NH, Reading MA, Birmingham AL...
+  always_allow:
+    - "New England"      # rescues "New England" before the soft "England" block
+    - "United States"
+    - "USA"
+    - "US-"
+    - "US."              # AtkinsRealis style: US.MA.Boston...
+    - "US "
+    - ", US"
+    - "Alabama"
+    - "Alaska"
+    - "Arizona"
+    - "Arkansas"
+    - "California"
+    - "Colorado"
+    - "Connecticut"
+    - "Delaware"
+    - "Florida"
+    - "Georgia"
+    - "Hawaii"
+    - "Idaho"
+    - "Illinois"
+    - "Indiana"
+    - "Iowa"
+    - "Kansas"
+    - "Kentucky"
+    - "Louisiana"
+    - "Maine"
+    - "Maryland"
+    - "Massachusetts"
+    - "Michigan"
+    - "Minnesota"
+    - "Mississippi"
+    - "Missouri"
+    - "Montana"
+    - "Nebraska"
+    - "Nevada"
+    - "New Hampshire"
+    - "New Jersey"
+    - "New Mexico"
+    - "New York"
+    - "North Carolina"
+    - "North Dakota"
+    - "Ohio"
+    - "Oklahoma"
+    - "Oregon"
+    - "Pennsylvania"
+    - "Rhode Island"
+    - "South Carolina"
+    - "South Dakota"
+    - "Tennessee"
+    - "Texas"
+    - "Utah"
+    - "Vermont"
+    - "Virginia"
+    - "Washington"
+    - "West Virginia"
+    - "Wisconsin"
+    - "Wyoming"
+    - "District of Columbia"
+    - ", AL"
+    - ", AK"
+    - ", AZ"
+    - ", AR"
+    - ", CA"
+    - ", CO"
+    - ", CT"
+    - ", DE"
+    - ", FL"
+    - ", GA"
+    - ", HI"
+    - ", ID"
+    - ", IL"
+    - ", IN"
+    - ", IA"
+    - ", KS"
+    - ", KY"
+    - ", LA"
+    - ", ME"
+    - ", MD"
+    - ", MA"
+    - ", MI"
+    - ", MN"
+    - ", MS"
+    - ", MO"
+    - ", MT"
+    - ", NE"
+    - ", NV"
+    - ", NH"
+    - ", NJ"
+    - ", NM"
+    - ", NY"
+    - ", NC"
+    - ", ND"
+    - ", OH"
+    - ", OK"
+    - ", OR"
+    - ", PA"
+    - ", RI"
+    - ", SC"
+    - ", SD"
+    - ", TN"
+    - ", TX"
+    - ", UT"
+    - ", VT"
+    - ", VA"
+    - ", WA"
+    - ", WV"
+    - ", WI"
+    - ", WY"
+    - ", DC"
+  # UK/Canada city names (some boards give only the city, e.g. Mott MacDonald 'Cambridge', AtkinsRealis 'GB.Derby...')
+  block:
+    # foreign cities often posted without a country (added 2026-10-07). In `block`, not block_hard, so a
+    # US homonym that names its state still passes via always_allow (Melbourne, FL / Perth Amboy, NJ / Wellington, FL).
+    - "Mumbai"
+    - "Delhi"
+    - "Bengaluru"
+    - "Bangalore"
+    - "Hyderabad"
+    - "Pune"
+    - "Chennai"
+    - "Kolkata"
+    - "Gurugram"
+    - "Gurgaon"
+    - "Noida"
+    - "Vadodara"
+    - "Ahmedabad"
+    - "Riyadh"
+    - "Jeddah"
+    - "Doha"
+    - "Muscat"
+    - "Sydney"
+    - "Melbourne"
+    - "Brisbane"
+    - "Perth"
+    - "Adelaide"
+    - "Canberra"
+    - "Auckland"
+    - "Wellington"
+    - "Christchurch"
+    - "Kuala Lumpur"
+    - "Jakarta"
+    - "Bangkok"
+    - "Manila"
+    - "Shanghai"
+    - "Beijing"
+    - "Tokyo"
+    - "Seoul"
+    # Workday "CC REGION City" codes (Parsons/Hatch): Saudi, UAE, Oman, Qatar, Kuwait, Bahrain + Canadian provinces
+    - "SA"
+    - "AE"
+    - "OM"
+    - "QA"
+    - "KW"
+    - "BH"
+    - "CA ON"
+    - "CA BC"
+    - "CA AB"
+    - "CA QC"
+    - "CA NT"
+    - "CA YT"
+    - "CA NU"
+    - "CA NS"
+    - "CA NB"
+    - "CA NL"
+    - "CA MB"
+    - "CA SK"
+    - "Al Khobar"
+    - "Al Wakrah"
+    - "Tabouk"
+    - "Sharjah"
+    - "Yellowknife"
+    - "Markham"
+    - "Oakville"
+    - "Burnaby"
+    - "St John Apos S"
+    - "England"
+    - "Vermont Avenue"
+    - "Vermont Ave"
+    - "London"
+    - "Toronto"
+    - "Vancouver"
+    - "Calgary"
+    - "Montreal"
+    - "Ottawa"
+    - "Manchester"
+    - "Birmingham"
+    - "Bristol"
+    - "Leeds"
+    - "Glasgow"
+    - "Edinburgh"
+    - "Cardiff"
+    - "Belfast"
+    - "Sheffield"
+    - "Newcastle"
+    - "Nottingham"
+    - "Liverpool"
+    - "Croydon"
+    - "Cambridge"
+    - "Oxford"
+    - "Southampton"
+    - "Brighton"
+    - "Aberdeen"
+    - "Warrington"
+    - "Guildford"
+    - "Leicester"
+    - "Coventry"
+    - "Swindon"
+    - "Exeter"
+    - "Plymouth"
+    - "Norwich"
+    - "Derby"
+    - "Epsom"
+    - "Whitehaven"
+    - "Peterborough"
+    - "Stockton-on-Tees"
+    - "Reading"
+    - "Bath"
+    - "Bangalore"
+    - "Bengaluru"
+    - "Milton Keynes"
+
+
+# Web searches the agent runs during a scan (for employers without a scannable job board).
+search_queries:
+  - name: Boston entry-level project engineer (GC)
+    query: '("project engineer" OR "assistant project engineer" OR "field engineer") construction "entry level" OR "new grad" (Boston OR Massachusetts)'
+    enabled: true
+  - name: New England assistant project manager / project coordinator
+    query: '("assistant project manager" OR "project coordinator") construction (Boston OR Massachusetts OR "New England" OR Connecticut OR "Rhode Island")'
+    enabled: true
+  - name: Entry-level estimator / preconstruction
+    query: '("assistant estimator" OR "junior estimator" OR "preconstruction coordinator") construction Massachusetts OR "New England"'
+    enabled: true
+  - name: Owner's project manager (OPM) firms in Massachusetts
+    query: '("owner''s project manager" OR "owner''s representative") "assistant" OR "project coordinator" Massachusetts job'
+    enabled: true
+  - name: Massachusetts public construction jobs (NEOGOV)
+    query: 'site:governmentjobs.com ("construction inspector" OR "project coordinator" OR "assistant project manager" OR "construction manager") Massachusetts'
+    enabled: true
+  - name: Construction project engineer roles that mention H-1B sponsorship
+    query: '"project engineer" OR "field engineer" construction "visa sponsorship" OR "H-1B" entry level'
+    enabled: true
+
+# Companies whose job boards are read on every scan.
+# "scan_method: local_parser" entries are read by the small Python scripts in local/ (shipped with this
+# kit; they need Python 3 with requests + beautifulsoup4). Several of them search only the six New England
+# states by design (noted per entry); the other boards cover the whole US and location_filter keeps US jobs.
+tracked_companies:
+
+  # =============================================================================================
+  # 1. Boston / New England general contractors and CM-at-risk firms (Boston first)
+  # =============================================================================================
+  # iCIMS boards: the built-in iCIMS reader returns these tenants without locations, so local/icims_jobs.py reads them.
+  - name: Suffolk Construction   # H-1B: weak (few filings) - ask early
+    careers_url: https://careers-suffolkconstruction.icims.com/jobs/search
+    scan_method: local_parser
+    parser: {command: python, script: local/icims_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+  - name: Gilbane Building Company   # H-1B: strong
+    careers_url: https://careers-gilbaneco.icims.com/jobs/search
+    scan_method: local_parser
+    parser: {command: python, script: local/icims_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+  - name: Skanska USA   # H-1B: strong
+    careers_url: https://careers-skanska.icims.com/jobs/search
+    scan_method: local_parser
+    parser: {command: python, script: local/icims_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+  - name: Shawmut Design and Construction   # H-1B: weak (filed as Shawmut Woodworking & Supply, 2020-22)
+    careers_url: https://careers-shawmut.icims.com/jobs/search
+    scan_method: local_parser
+    parser: {command: python, script: local/icims_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+  - name: Flatiron Dragados   # heavy civil; H-1B: green-card filings only
+    careers_url: https://careers-fdcorp.icims.com/jobs/search
+    scan_method: local_parser
+    parser: {command: python, script: local/icims_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+  # Turner runs four Cornerstone career sites; the same name on all four lets duplicate postings merge.
+  - name: Turner Construction   # H-1B: strong (one of the biggest GC sponsors)
+    careers_url: https://www.turnerconstruction.com/careers
+    api: https://turnerconstruction.csod.com/ux/ats/careersite/1/home?c=turnerconstruction
+    enabled: true
+  - name: Turner Construction
+    careers_url: https://www.turnerconstruction.com/careers
+    api: https://turnerconstruction.csod.com/ux/ats/careersite/2/home?c=turnerconstruction
+    enabled: true
+  - name: Turner Construction
+    careers_url: https://www.turnerconstruction.com/careers
+    api: https://turnerconstruction.csod.com/ux/ats/careersite/3/home?c=turnerconstruction
+    enabled: true
+  - name: Turner Construction
+    careers_url: https://www.turnerconstruction.com/careers
+    api: https://turnerconstruction.csod.com/ux/ats/careersite/4/home?c=turnerconstruction
+    enabled: true
+  - name: Consigli Construction   # H-1B: strong
+    careers_url: https://apply.workable.com/consigli-construction-1/
+    enabled: true
+  - name: Columbia Construction Company   # H-1B: strong (small firm, recent filings)
+    careers_url: https://recruiting.paylocity.com/recruiting/jobs/All/85842f4e-7110-4fa2-b69b-badec17247df/Columbia-Construction-Company
+    scan_method: local_parser
+    parser: {command: python, script: local/paylocity_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+  - name: Callahan Construction Managers   # H-1B: strong (small firm)
+    careers_url: https://workforcenow.adp.com/mascsr/default/mdf/recruitment/recruitment.html?cid=3aa0f8d6-a962-4185-b0eb-73b92617e509&ccId=19000101_000001&lang=en_US
+    enabled: true
+  - name: Lee Kennedy Co.   # H-1B: strong (small firm)
+    careers_url: https://leekennedy.bamboohr.com/careers
+    enabled: true
+  - name: Dimeo Construction   # Providence RI / Boston / CT; H-1B: none found
+    careers_url: https://apply.workable.com/dimeo/
+    enabled: true
+  - name: NEI General Contracting   # Boston HQ; H-1B: strong (small firm). Board: Paycom (linked from neigc.com/careers)
+    careers_url: https://www.paycomonline.net/v4/ats/web.php/jobs?clientkey=BFB96F35DC6FC2EAFB2AEA5BA4D80F87
+    scan_method: local_parser
+    parser: {command: python, script: local/paycom_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+  - name: J.F. White Contracting   # heavy civil (Framingham); Dragados USA's UKG board; H-1B: none found
+    careers_url: https://recruiting.ultipro.com/DRA1001DRAGA/JobBoard/5d9ce629-e39d-4abd-97fc-0787c62a2767/
+    enabled: true
+  - name: Middlesex Corporation   # heavy civil (Littleton MA); H-1B: moderate (recent filings)
+    careers_url: https://middlesexco.com/careers/
+    scan_method: local_parser
+    parser: {command: python, script: local/birddoghr_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+  - name: Cashman Dredging & Marine (Jay Cashman)   # Quincy MA, marine/heavy civil; H-1B: none found
+    careers_url: https://www.jaycashman.com/careers/
+    scan_method: local_parser
+    parser: {command: python, script: local/jaycashman_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+  - name: Dellbrook|JKS   # Quincy MA; H-1B: none found
+    careers_url: https://apply.workable.com/dellbrookjks/
+    enabled: true
+  - name: Whiting-Turner   # H-1B: none found. local parser searches New England states only (add ?SelectedLocations=US|US-NY etc. to widen)
+    careers_url: https://jobs.silkroad.com/WhitingTurner/Careers
+    scan_method: local_parser
+    parser: {command: python, script: local/silkroad_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+  - name: Walsh Group   # Walsh Construction / Archer Western; H-1B: strong. local parser searches New England only by default
+    careers_url: https://walshgroup.jobs/
+    scan_method: local_parser
+    parser: {command: python, script: local/directemployers_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+
+  # =============================================================================================
+  # 2. National general contractors (Boston offices where noted; otherwise relocation)
+  # =============================================================================================
+  - name: Clark Construction   # H-1B: moderate
+    careers_url: https://clark.wd503.myworkdayjobs.com/ClarkExternal
+    enabled: true
+  - name: Tutor Perini   # H-1B: weak
+    careers_url: https://tutorperini.wd12.myworkdayjobs.com/external
+    enabled: true
+  - name: DPR Construction   # Boston office; H-1B: strong. Eightfold "PCSX" board - local parser searches New England states only
+    careers_url: https://careers.dpr.com/
+    scan_method: local_parser
+    parser: {command: python, script: local/eightfold_pcsx_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+  - name: Kiewit   # H-1B: strong (filings mostly under Kiewit Engineering Group)
+    careers_url: https://kiewitcareers.kiewit.com/search/
+    provider: successfactors
+    api: https://kiewitcareers.kiewit.com
+    enabled: true
+  - name: PCL Construction   # H-1B: strong
+    careers_url: https://careers.pcl.com/search/
+    provider: successfactors
+    api: https://careers.pcl.com
+    enabled: true
+  - name: Balfour Beatty US   # H-1B: strong. Dayforce board answered "503" on 2026-10-14 - see below
+    careers_url: https://jobs.dayforcehcm.com/en-US/balfourbeatty/CANDIDATEPORTALBUILDINGCIVILS
+    scan_method: local_parser
+    parser: {command: python, script: local/dayforce_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: false   # PAUSED: the board answered "503 Service Unavailable" twice on 2026-10-14. Test it with
+                     #   python local/dayforce_jobs.py <careers_url>   and set true if it prints jobs.
+  - name: Mortenson   # Boston-area presence limited; H-1B: strong (M. A. Mortenson Company)
+    careers_url: https://fa-esgu-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs
+    enabled: true
+  - name: McCarthy Building Companies   # H-1B: strong
+    careers_url: https://jobs.jobvite.com/mccarthy-building-co
+    enabled: true
+  - name: Hensel Phelps   # H-1B: strong; has an "Entry-Level" job category
+    careers_url: https://careers.henselphelps.com/search/
+    provider: successfactors
+    api: https://careers.henselphelps.com
+    enabled: true
+  - name: STO Building Group (Structure Tone, Layton, Pepper)   # Boston office; H-1B: strong (Structure Tone)
+    careers_url: https://fa-exrr-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/stobg/jobs
+    enabled: true
+  - name: Swinerton   # H-1B: strong
+    careers_url: https://swinerton.wd1.myworkdayjobs.com/Swinerton_External_Career
+    enabled: true
+  - name: Holder Construction   # H-1B: weak (recent, 2025-26)
+    careers_url: https://job-boards.greenhouse.io/holderconstruction
+    enabled: true
+  - name: Lendlease (US)   # Boston office; global board, US jobs kept by location_filter; H-1B: weak
+    careers_url: https://lendlease.wd3.myworkdayjobs.com/LendleaseCareers
+    enabled: true
+  - name: Bechtel   # H-1B: strong (Bechtel Energy and other units); many federal sites need citizenship
+    careers_url: https://jobs.bechtel.com
+    provider: phenom
+    phenom:
+      lang: en_us
+      country: us
+      urlPrefix: us/en
+    enabled: true
+  - name: Fluor   # H-1B: strong; many federal sites need citizenship
+    careers_url: https://fluor.eightfold.ai/careers?domain=fluor.com
+    max_pages: 70
+    enabled: true
+  - name: Sundt Construction   # H-1B: strong
+    careers_url: https://eewl.fa.us6.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX/jobs
+    enabled: true
+  - name: Webcor   # California; H-1B: strong
+    careers_url: https://webcor.wd503.myworkdayjobs.com/webcor
+    enabled: true
+  - name: The Haskell Company   # H-1B: strong
+    careers_url: https://careers.haskell.com/careers-home/jobs
+    provider: jibeapply
+    api: https://careers.haskell.com/api/jobs
+    enabled: true
+  - name: Austin Industries (Austin Commercial)   # Texas; H-1B: strong (Austin Commercial)
+    careers_url: https://recruiting2.ultipro.com/AUS1003AUIN/JobBoard/611d5a38-76c4-4f66-a55f-2bc012d98024/
+    enabled: true
+  - name: Granite Construction   # heavy civil; H-1B: moderate
+    careers_url: https://granite.wd1.myworkdayjobs.com/careers
+    enabled: true
+  - name: Gray Construction   # H-1B: strong (small number). Built-in iCIMS reader returns 0 jobs here, so the local parser
+    # reads it (this tenant reports the company name instead of a city as the location, so every posting passes location_filter)
+    careers_url: https://careershub-gray.icims.com/jobs/search
+    scan_method: local_parser
+    parser: {command: python, script: local/icims_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+  - name: Walbridge   # Detroit; H-1B: moderate
+    careers_url: https://careers-walbridge.icims.com/jobs/search
+    scan_method: local_parser
+    parser: {command: python, script: local/icims_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+  - name: Barton Malow   # H-1B: moderate
+    careers_url: https://careers.bartonmalow.com/search/
+    provider: successfactors
+    api: https://careers.bartonmalow.com
+    enabled: true
+  - name: Hoffman Construction   # Pacific Northwest; H-1B: weak
+    careers_url: https://efsp.fa.us6.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX/jobs
+    enabled: true
+  - name: JE Dunn Construction   # H-1B: weak
+    careers_url: https://jobs.jedunn.com/search/
+    provider: successfactors
+    api: https://jobs.jedunn.com
+    enabled: true
+  - name: Alberici   # St. Louis; H-1B: weak
+    careers_url: https://recruiting2.ultipro.com/JSA1000AC/JobBoard/5944dc74-3d77-4d96-85ad-fb9e18823498/
+    enabled: true
+  - name: Brasfield & Gorrie   # Southeast; H-1B: none found
+    careers_url: https://careers.brasfieldgorrie.com/jobs
+    provider: jibeapply
+    api: https://careers.brasfieldgorrie.com/api/jobs
+    enabled: true
+  - name: Hoar Construction   # Southeast; H-1B: none found
+    careers_url: https://jobs.jobvite.com/hoar
+    enabled: true
+
+  # =============================================================================================
+  # 3. Owner's rep / program & project management / cost consultants, and AEC firms with CM groups
+  # =============================================================================================
+  - name: Jacobs   # H-1B: strong. NOTE: local parser is limited to New England + the "Civil and Structural" and
+    # "Environmental" capability filters, so owner's-rep/CM jobs under other capabilities can be missed - also
+    # search careers.jacobs.com by hand for "construction management" now and then.
+    careers_url: https://careers.jacobs.com/en_US/careers/SearchJobs
+    scan_method: local_parser
+    parser: {command: python, script: local/jacobs_avature_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+  - name: AECOM   # includes AECOM Tishman / AECOM Hunt; H-1B: strong (AECOM Technical Services)
+    careers_url: https://careers.smartrecruiters.com/AECOM2
+    enabled: true
+  - name: Cumming Group   # cost management / owner's rep; H-1B: strong
+    careers_url: https://cumminggroup.wd1.myworkdayjobs.com/CGC
+    enabled: true
+  - name: Hill International   # H-1B: moderate
+    careers_url: https://hcib.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001/jobs
+    enabled: true
+  - name: PMA Consultants   # Boston/Worcester offices; H-1B: many filings (flagged as staffing-style filer)
+    careers_url: https://jobs.lever.co/pmaconsultants
+    enabled: true
+  - name: Turner & Townsend   # global board, US jobs kept by location_filter; H-1B: strong
+    careers_url: https://careers.smartrecruiters.com/TurnerTownsend
+    enabled: true
+  - name: JLL (Jones Lang LaSalle)   # global board; project management jobs; H-1B: strong
+    careers_url: https://jll.wd1.myworkdayjobs.com/jllcareers
+    enabled: true
+  - name: Cushman & Wakefield   # global board; project management jobs; H-1B: moderate
+    careers_url: https://cw.wd1.myworkdayjobs.com/External
+    enabled: true
+  - name: Colliers Project Leaders   # US + Canada board; H-1B: strong (Colliers Engineering & Design)
+    careers_url: https://careers-colliersprojects.icims.com/jobs/search
+    scan_method: local_parser
+    parser: {command: python, script: local/icims_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+  - name: CHA Consulting   # construction inspection / CM, New England offices; H-1B: strong
+    careers_url: https://jobs-challp.icims.com/jobs/search
+    scan_method: local_parser
+    parser: {command: python, script: local/icims_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+  - name: Vanir Construction Management   # mostly West Coast; H-1B: weak
+    careers_url: https://careers-vanir.icims.com/jobs/search
+    scan_method: local_parser
+    parser: {command: python, script: local/icims_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+  - name: Arcadis   # H-1B: strong. Eightfold "PCSX" board - local parser searches New England states only
+    careers_url: https://careers.arcadis.com/
+    scan_method: local_parser
+    parser: {command: python, script: local/eightfold_pcsx_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+  - name: WSP USA   # H-1B: strong
+    careers_url: https://emit.fa.ca3.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_2001/jobs
+    locationId: 300000000317426   # "United States" facet (CX_2001 is WSP's global site)
+    enabled: true
+  - name: STV   # construction management group; H-1B: strong
+    careers_url: https://stvinc.wd5.myworkdayjobs.com/stv
+    enabled: true
+  - name: HNTB   # construction management group; H-1B: strong
+    careers_url: https://hntb.wd5.myworkdayjobs.com/HNTB_Careers
+    enabled: true
+  - name: Parsons   # H-1B: strong; some federal roles need clearance
+    careers_url: https://parsons.wd5.myworkdayjobs.com/Search
+    enabled: true
+  - name: AtkinsRealis   # incl. Faithful+Gould cost/project management; H-1B: strong. Global board, US-only via Workday's Country facet
+    careers_url: https://slihrms.wd3.myworkdayjobs.com/Careers
+    scan_method: local_parser
+    parser: {command: python, script: local/workday_us_jobs.py, args: ["{careers_url}", "Location_Country=bc33aa3152ec42d4995f4791a106ed09"], format: jobs-json-v1}
+    enabled: true
+  - name: Mott MacDonald   # H-1B: strong
+    careers_url: https://apply.mottmac.com
+    provider: successfactors
+    api: https://apply.mottmac.com
+    enabled: true
+  - name: Michael Baker International   # construction inspection / CM; H-1B: strong
+    careers_url: https://ebxs.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_2/jobs
+    enabled: true
+  - name: Black & Veatch   # construction management roles on utility/water projects; H-1B: strong
+    careers_url: https://careers.bv.com
+    provider: successfactors
+    api: https://careers.bv.com
+    enabled: true
+  - name: VHB   # Boston (Watertown) HQ; resident engineer / construction inspection roles; H-1B: weak
+    careers_url: https://careers-vhb.icims.com/jobs/search
+    scan_method: local_parser
+    parser: {command: python, script: local/icims_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+
+  # =============================================================================================
+  # 4. Public owners in Massachusetts (check every JD for citizenship / no-sponsorship text)
+  # =============================================================================================
+  - name: Commonwealth of Massachusetts (MassCareers - DCAMM, MassDOT, other agencies)   # H-1B: some filings
+    careers_url: https://massanf.taleo.net/careersection/ex/jobsearch.ftl
+    enabled: true
+  - name: MBTA   # H-1B: moderate
+    careers_url: https://www.governmentjobs.com/careers/mbtama
+    enabled: true
+  - name: Massachusetts Port Authority (Massport)   # H-1B: weak
+    careers_url: https://iapiqy.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1
+    enabled: true
+  - name: Massachusetts School Building Authority (MSBA)
+    careers_url: https://jobs.lever.co/massschoolbuildings
+    enabled: true
+  - name: City of Boston
+    careers_url: https://www.governmentjobs.com/careers/boston
+    enabled: true
+  - name: MWRA   # water/sewer authority; construction coordinator / inspector roles
+    careers_url: https://mwra.applicantpro.com/jobs/
+    scan_method: local_parser
+    parser: {command: python, script: local/applicantpro_jobs.py, args: ["{careers_url}"], format: jobs-json-v1}
+    enabled: true
+
+# Not scanned automatically (no readable job board found on 2026-10-14) - check by hand now and then:
+#   Bond Brothers (Everett/Norwood MA; H-1B strong) - UKG board on a host career-ops can't read yet:
+#     https://mybond.rec.pro.ukg.net/BON1008BBRI/JobBoard/fbfc75e0-0714-4a84-b736-333027543ec2/
+#   Rider Levett Bucknall (cost consultant; H-1B strong) - same UKG problem:
+#     https://riderlb.rec.pro.ukg.net/RID1501RLBN/JobBoard/fb627056-6d5f-4205-b420-441e429de2ba/
+#   Commodore Builders (commodorebuilders.com), John Moriarty & Associates (jm-a.com), Walsh Brothers,
+#   Tocci Building Companies (tocci.com/join-the-team), Cianbro (cianbro.com/careers-list),
+#   PC Construction (pcconstruction.com/careers), Barletta Heavy Division, Leftfield (OPM, Boston),
+#   CBRE project management (careers.cbre.com - blocks automated reading), Boston Housing Authority
+#   (bostonhousing.org job postings, apply by email), Messer Construction, Robins & Morton.
+# Left out on purpose: NYC School Construction Authority (states it cannot sponsor visas).

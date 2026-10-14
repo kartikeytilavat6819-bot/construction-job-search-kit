@@ -1,0 +1,147 @@
+# Career-Ops profile - CONSTRUCTION MANAGEMENT starter version.
+#
+# This is the single source of truth for your personal details. Every mode (evaluation, CV, cover
+# letter, autofill) reads it. Fill in everything marked [YOUR ...] and answer every TODO before you
+# rely on the output. Never leave a placeholder in a field you send to an employer.
+#
+# Check the file after editing:   node validate-profile.mjs
+# (Warnings only - it tells you about typos in key names, it never blocks anything.)
+
+candidate:
+  full_name: "[YOUR FULL NAME]"
+  # The headline printed under your name on the CV. Keep it honest; the CV step tailors it per job.
+  title: "Construction Management Graduate"
+  email: "[YOUR EMAIL]"
+  # Optional: other addresses that are also you (e.g. your university email).
+  # alternate_emails:
+  #   - "[YOUR SCHOOL EMAIL]"
+  phone: "[YOUR PHONE, e.g. (617) 555-0123]"
+  location: "Boston, MA"          # TODO: change if you live somewhere else
+  linkedin: "[linkedin.com/in/YOUR-HANDLE]"
+  portfolio_url: ""               # optional: a project portfolio or personal site
+  github: ""                      # leave empty unless you use GitHub
+  photo: ""                       # keep empty: US employers and ATS systems prefer no photo
+
+target_roles:
+  # The titles you are aiming for, best first. Evaluations score each job against these.
+  primary:
+    - "Project Engineer (general contractor / CM-at-risk) - the #1 entry-level title"
+    - "Assistant Project Manager / Project Coordinator"
+    - "Field Engineer / Assistant Superintendent"
+    - "Assistant or Junior Estimator / Preconstruction"
+  # fit: primary = dream role, secondary = good fit, adjacent = acceptable stretch
+  archetypes:
+    - name: "Project Engineer / Assistant Project Engineer at a general contractor or CM-at-risk firm (Suffolk, Gilbane, Turner, Skanska, Consigli...)"
+      level: "Entry (0-2 yrs, new grad)"
+      fit: "primary"
+    - name: "Assistant Project Manager / Project Coordinator (GC or owner side)"
+      level: "Entry (0-2 yrs)"
+      fit: "primary"
+    - name: "Field Engineer / Assistant Superintendent (on-site field operations)"
+      level: "Entry (new grad)"
+      fit: "primary"
+    - name: "Assistant / Junior Estimator, Preconstruction Engineer or Coordinator"
+      level: "Entry (0-2 yrs)"
+      fit: "secondary"
+    - name: "Project Controls: Scheduler, Cost Engineer, Project Controls Analyst"
+      level: "Entry (0-2 yrs)"
+      fit: "secondary"
+    - name: "Owner's Representative / Program or Project Management associate (Jacobs, AECOM, CBRE, JLL, Cumming, Hill, PMA, Turner & Townsend)"
+      level: "Entry (0-2 yrs)"
+      fit: "secondary"
+    - name: "Construction Inspector / QA-QC, VDC or BIM Coordinator"
+      level: "Entry"
+      fit: "adjacent"
+
+narrative:
+  # TODO: rewrite all of this in your own words once cv.md is filled in. Placeholders below.
+  headline: "Construction management graduate ([YOUR DEGREE], [YOUR SCHOOL] '[YY]) ready to start as a Project Engineer"
+  exit_story: "Finishing a [YOUR DEGREE] at [YOUR SCHOOL] in [MONTH YEAR] after [YOUR INTERNSHIP / CO-OP / SITE EXPERIENCE]; looking for a first full-time project engineer or assistant project manager role, Boston area first."
+  # 3-5 things you are genuinely good at. Only list what cv.md can back up.
+  superpowers:
+    - "[e.g. Submittal and RFI tracking in Procore on an active job site]"
+    - "[e.g. Quantity takeoffs and estimates in Excel / Bluebeam]"
+    - "[e.g. Scheduling in MS Project or Primavera P6]"
+  # Projects or internships with a number attached (budget, square feet, % saved, # of RFIs...).
+  proof_points:
+    - name: "[PROJECT OR INTERNSHIP NAME]"
+      url: ""
+      hero_metric: "[e.g. Tracked 120+ RFIs and submittals on a $40M mid-rise]"
+    - name: "[CAPSTONE / COURSE PROJECT]"
+      url: ""
+      hero_metric: "[e.g. Built a 300-activity CPM schedule for a 5-story building]"
+
+compensation:
+  # TODO: decide your salary expectation. Entry-level project engineers at Boston GCs are often
+  # quoted around $70K-$90K; check the posted range on each job (Massachusetts requires one).
+  target_range: "TODO - e.g. market rate for entry-level Project Engineer in Boston"
+  currency: "USD"
+  minimum: "TODO - leave as 'None set' if you never want a job failed on pay"
+  location_flexibility: "Boston and near Boston preferred; then the rest of New England; open to relocating anywhere in the US; on-site or hybrid preferred, fully remote least preferred"
+
+location:
+  country: "United States"
+  city: "Boston"
+  timezone: "ET"
+  # TODO: confirm the exact wording. If your construction management degree is STEM-designated
+  # (check the CIP code on your I-20 against the DHS STEM list: 52.2001 "Construction Management"
+  # (business) is NOT on it; 15.1001 "Construction Engineering Technology" and 14.3301 "Construction
+  # Engineering" are), you get the 24-month STEM OPT extension - and the employer must use E-Verify.
+  # Confirm with your school's international student office before you rely on it.
+  visa_status: "F-1 student on OPT, currently authorized to work in the US; will need H-1B sponsorship in the future (STEM OPT eligibility: TODO confirm)"
+  # Left empty on purpose: OPT is temporary, so a job that refuses sponsorship now OR in the future
+  # is a real blocker even for US roles. modes/_profile.md -> Location Policy has the exact rule.
+  authorized_in: []
+  needs_sponsorship: true
+  willing_to_relocate: true   # anywhere in the US; Boston area first
+
+language:
+  output: en
+
+# Which AI model tier evaluates jobs: economy | standard | premium. standard is the safe default.
+spend_tier: standard
+
+# Batch workers run without a browser; this lets job-page extraction use the headless helper so
+# JavaScript-heavy boards (Workday, Taleo, Phenom) are readable. Remove it if it causes problems.
+scan:
+  extractor: cli
+
+# Auto-build a tailored CV PDF for every job scoring at least this much (out of 5).
+# 3.0 is the upstream default. Set 0 to get a CV for every evaluated job (slower).
+auto_pdf_score_threshold: 3.0
+page_format: letter
+
+cv:
+  # LaTeX resumes (TinyTeX is installed by setup). The base .tex files are built from master-resume.json by
+  # local/resume-builder/build_resume.py (resume-project-engineer.tex, resume-field.tex, resume-estimating.tex).
+  # The website's Edit CV button only works with LaTeX output.
+  output_format: "latex"
+
+latex:
+  source: resume-project-engineer.tex   # default base; modes/_profile.md can map job types to the other tracks
+
+cover_letter:
+  notice_period_days: 14            # TODO: how soon after an offer could you start?
+  primary_domain: "construction management (general contracting, project engineering, cost and schedule control)"
+
+contact_preferences:
+  preferred_channel: "email"
+
+# Two-pass triage: jobs scoring below 3.0 in the quick first pass are filtered out; 3.0-3.4 are
+# shown to you as "marginal"; 3.5+ go on to a full evaluation.
+pipeline:
+  triage_threshold: 3.5
+  triage_min_urls: 5
+
+# ---------------------------------------------------------------------------------------------
+# TODO list - answer these before you start applying (then delete the line):
+#   1. Name, email, phone, LinkedIn in the candidate block above.
+#   2. Degree name, school, graduation month/year (also in cv.md).
+#   3. Is the CM degree STEM-designated (STEM OPT, 24 extra months)? Check the CIP code on your I-20.
+#   4. OPT dates: EAD card start/end, or "applying - expected start [MONTH YEAR]".
+#   5. Earliest start date you can accept.
+#   6. Salary expectation (compensation block).
+#   7. Certifications you actually HOLD vs plan to get (OSHA 10/30, LEED Green Associate, Procore
+#      certifications, CM-BOK / CAC, EIT/FE). Only held ones go on the CV - see modes/_profile.md.
+#   8. Driver's license / car (many site roles ask) - answer in application forms only, not on the CV.
+# ---------------------------------------------------------------------------------------------

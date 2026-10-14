@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { width: 360px; margin: 0; padding: 12px; font: 13px/1.4 "Segoe UI", Arial, sans-serif; color: #0f172a; background: #fff; }
+  h1 { font-size: 14px; margin: 0 0 8px; }
+  label { display: block; margin: 10px 0 4px; font-weight: 600; }
+  select, input[type=range] { width: 100%; }
+  select { padding: 4px; font: inherit; }
+  .muted { color: #64748b; font-size: 12px; }
+  .warn { color: #b45309; font-size: 12px; margin-top: 6px; }
+  .docs { margin-top: 6px; font-size: 12px; }
+  .row { display: flex; gap: 8px; margin-top: 12px; }
+  button { flex: 1; padding: 7px; border: 0; border-radius: 6px; font: inherit; font-weight: 600; cursor: pointer; }
+  #start { background: #16a34a; color: #fff; }
+  #stop { background: #e2e8f0; color: #0f172a; }
+  #state { margin-top: 10px; font-size: 12px; }
+  .detected { margin: 10px 0 4px; padding: 8px 10px; border-radius: 8px; background: #f0fdf4; border: 1px solid #bbf7d0; }
+  .dtitle { font-weight: 600; }
+  #change { display: inline-block; margin-top: 2px; }
+</style>
+</head>
+<body>
+  <h1>career-ops Autofill</h1>
+  <div class="muted">Types your details into this page while you watch. Never clicks Next or Submit.</div>
+
+  <div id="detected" class="detected" hidden></div>
+  <a href="#" id="change" class="muted">Not this job? Pick another</a>
+  <div id="pickBox" hidden>
+    <label for="job">Application (from your tracker)</label>
+    <select id="job"></select>
+  </div>
+  <div id="conn" class="warn" hidden></div>
+  <div id="docs" class="docs"></div>
+
+  <label for="speed">Typing speed: <span id="speedVal"></span></label>
+  <input id="speed" type="range" min="0" max="120" step="5">
+  <div class="muted">Left = instant, right = slower so it's easier to follow.</div>
+
+  <div class="row">
+    <button id="start">Start filling</button>
+    <button id="stop">Stop</button>
+  </div>
+  <div id="state" class="muted"></div>
+  <button id="update" hidden style="margin-top:10px;width:100%;background:#2563eb;color:#fff">Update ready: click to apply (one second)</button>
+  <script src="popup.js"></script>
+</body>
+</html>
